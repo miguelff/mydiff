@@ -1,10 +1,13 @@
 # `mydiff`
 
+<img width="1024" alt="mydiff logo" src="https://user-images.githubusercontent.com/210307/62741731-4f22de00-ba3c-11e9-89ee-da12f92e0b4f.png">
+
+
 Compute the differences between two MySQL schemas.
 
-mydiff is an alternative to [mysqldiff](https://docs.oracle.com/cd/E17952_01/mysql-utilities-1.5-en/mysqldiff.html#option_mysqldiff_difftype) that can output schema differences as migration scripts for [gh-ost](https://github.com/github/gh-ost), or as [active record migrations](https://edgeguides.rubyonrails.org/active_record_migrations.html)
+`mydiff` is an alternative to [mysqldiff](https://docs.oracle.com/cd/E17952_01/mysql-utilities-1.5-en/mysqldiff.html#option_mysqldiff_difftype) that can output schema differences as migration scripts for [gh-ost](https://github.com/github/gh-ost), or as [activerecord migrations](https://edgeguides.rubyonrails.org/active_record_migrations.html)
 
-It's written in golang and can compute the differences in parallel, to speed up the comparision of large schemas.
+It's written in golang, as a thin wrapper of [skeema/tengo](github.com/skeema/tengo/)
 
 ## Usage (`mydiff --help`)
 
@@ -38,7 +41,10 @@ COPYRIGHT:
     
 ## Design decisions and trade-offs
 
-TBD
+- [skeema/tengo](github.com/skeema/tengo/) does a great job at computing differences in schemas, thus this tool does not 
+reinvent the wheel and instead provides a thin wrapper atop tengo, which focuses on providing a replacement for [mysqldiff](https://docs.oracle.com/cd/E17952_01/mysql-utilities-1.5-en/mysqldiff.html#option_mysqldiff_difftype)
+that is able to output changes as [gh-ost](https://github.com/github/gh-ost) commands, or as [activerecord migrations](https://edgeguides.rubyonrails.org/active_record_migrations.html)
+
 
 ## Missing features
 
@@ -46,6 +52,7 @@ TBD
 - [ ] parse server connection descriptors in different formats that are more flexible than golang sqlx parser
 - [ ] demo
 - [ ] unit tests
+- [ ] parallel comparisions for big schemas
 
 ## License
 
@@ -53,4 +60,4 @@ TBD
 
 ## Authors
 
-`mydiff` is designed, authored, reviewed and tested by [@miguelff](https://github.com/miguelff)
+`mydiff` is authored by [@miguelff](https://github.com/miguelff)
