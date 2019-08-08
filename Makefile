@@ -1,18 +1,18 @@
 GO_BUILD_ENV := CGO_ENABLED=0 GOOS=linux GOARCH=amd64
-DOCKER_BUILD=$(shell pwd)/.docker_build
-DOCKER_CMD=$(DOCKER_BUILD)/mydiff
+BUILD_DIR=$(shell pwd)/.build
+CMD=$(BUILD_DIR)/mydiff
 
 .PHONY: test
 test:
-	go test -v ./...
+	go test -v ./go/...
 
 coverage:
-	go test -v ./... -coverprofile .coverage
+	go test -v ./go/... -coverprofile .coverage
 	go tool cover -html .coverage
 
 build: clean
-	mkdir -p $(DOCKER_BUILD)
-	$(GO_BUILD_ENV) go build -v -o $(DOCKER_CMD) .
+	mkdir -p $(BUILD_DIR)
+	$(GO_BUILD_ENV) go build -v -o $(CMD) ./go/cmd
 
 clean:
-	rm -rf $(DOCKER_BUILD)
+	rm -rf $(BUILD_DIR)
