@@ -2,35 +2,30 @@
 
 Compute the differences between two MySQL schemas.
 
-mydiff is an alternative to [mysqldiff](https://docs.oracle.com/cd/E17952_01/mysql-utilities-1.5-en/mysqldiff.html#option_mysqldiff_difftype) that can output schema differences as migration scripts for [gh-ost](https://github.com/github/gh-ost), [pt-ost](https://www.percona.com/doc/percona-toolkit/LATEST/pt-online-schema-change.html), or as [active record migrations](https://edgeguides.rubyonrails.org/active_record_migrations.html)
+mydiff is an alternative to [mysqldiff](https://docs.oracle.com/cd/E17952_01/mysql-utilities-1.5-en/mysqldiff.html#option_mysqldiff_difftype) that can output schema differences as migration scripts for [gh-ost](https://github.com/github/gh-ost), or as [active record migrations](https://edgeguides.rubyonrails.org/active_record_migrations.html)
 
 It's written in golang and can compute the differences in parallel, to speed up the comparision of large schemas.
 
-## Usage
+## Usage (`mydiff --help`)
 
-`mydiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4`
+```
+NAME:
+   mydiff - Compute the differences between two MySQL schemas
 
-### Options
+USAGE:
+   mydiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket schema_name [schema_name in server2]
 
-*`--version`* 
+GLOBAL OPTIONS:
+   --server1 value             connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.
+   --server2 value             connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.
+   -d value, --difftype value  display differences in one of the following formats: [sql|gh-ost|ar] (default: "sql")
+   -r, --reverse               show diff in reverse direction, from server2 to server1
+   -v, --version               display version
+   -h, --help                  display this help
 
-show program's version number and exit
-
-*`--help`*
-
-display a help message and exit
-
-*`--server1=SERVER1`*
-
-connection information for first server in the form: `<user>[:<password>]@<host>[:<port>][:<socket>]` or `<login-path>[:<port>][:<socket>]` or path yo `my.cnf` file.
-
-*`--server2=SERVER2`*
-
-connection information for first server in the form: `<user>[:<password>]@<host>[:<port>][:<socket>]` or `<login-path>[:<port>][:<socket>]` or path yo `my.cnf` file.
-
-*`-d DIFFTYPE`, `--difftype=DIFFTYPE`*
-
-display differences in context format in one of the following formats: [`sql|gh-ost|pt-osc|activerecord`] (default: `sql`).
+COPYRIGHT:
+   Copyright 2019 Miguel Fernández. Licensed under MIT license
+```
 
 ## Testing `mysqldiff`
 
@@ -47,7 +42,10 @@ TBD
 
 ## Missing features
 
-TBD
+- [ ] Output diff in the different formats (ar migrations, gh-ost, etc)
+- [ ] parse server connection descriptors in different formats that are more flexible than golang sqlx parser
+- [ ] demo
+- [ ] unit tests
 
 ## License
 
