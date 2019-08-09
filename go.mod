@@ -8,5 +8,6 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/jmoiron/sqlx v1.2.0 // indirect
 	github.com/skeema/tengo v0.8.17
+	github.com/stretchr/testify v1.2.2
 	github.com/urfave/cli v1.21.0
 )

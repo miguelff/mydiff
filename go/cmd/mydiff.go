@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/urfave/cli"
 	"github.com/skeema/tengo"
+	"github.com/urfave/cli"
 )
 
 const driver = "mysql"
@@ -29,30 +29,30 @@ func main() {
 	app.HideHelp = true
 	app.HideVersion = true
 
-	app.Flags = []cli.Flag {
+	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name: "server1",
+			Name:  "server1",
 			Usage: "connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.",
 		},
 		cli.StringFlag{
-			Name: "server2",
+			Name:  "server2",
 			Usage: "connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.",
 		},
 		cli.StringFlag{
-			Name: "d, difftype",
+			Name:  "d, difftype",
 			Value: "sql",
-			Usage: "display differences in one of the following formats: [sql|gh-ost|ar]",
+			Usage: "display differences in one of the following formats: [sql|ghost|ar]",
 		},
 		cli.BoolFlag{
-			Name: "r, reverse",
+			Name:  "r, reverse",
 			Usage: "show diff in reverse direction, from server2 to server1",
 		},
 		cli.BoolFlag{
-			Name: "v, version",
+			Name:  "v, version",
 			Usage: "display version",
 		},
 		cli.BoolFlag{
-			Name: "h, help",
+			Name:  "h, help",
 			Usage: "display this help",
 		},
 	}
@@ -100,9 +100,10 @@ func main() {
 			from = tmp
 		}
 
-		diff := tengo.NewSchemaDiff(from, to)
-		fmt.Println(diff.String())
-		return nil
+		formatter := Formatter.New(c.GlobalString("difftype"))
+		diff := Diff.New(from, to)
+		result := formatter.Format(diff)
+		fmt.Print(result)
 	}
 
 	err := app.Run(os.Args)
