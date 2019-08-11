@@ -1,18 +1,14 @@
 version: "3.7"
 services:
   server1:
+    image: percona:5.7
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=1
-    build:
-      context: .
-      dockerfile: Dockerfile-server
     ports:
       - "33060:3306"
   server2:
+    image: percona:5.7
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=1
-    build:
-      context: .
-      dockerfile: Dockerfile-server
     ports:
       - "33062:3306"
