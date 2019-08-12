@@ -26,5 +26,5 @@ db_down:
 
 .PHONY: db_up
 db_up:
-	docker-compose up --build --abort-on-container-exit
+	docker-compose up -d --build
 

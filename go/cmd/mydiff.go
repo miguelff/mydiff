@@ -1,10 +1,24 @@
+// mydiff - Compute the differences between two MySQL schemas.
+//
+// Copyright (c) 2019 Miguel Fernández Fernández
+//
+// This Source Code Form is subject to the terms of MIT License:
+// A short and simple permissive license with conditions only
+// requiring preservation of copyright and license notices.
+// Licensed works, modifications, and larger works may be
+// distributed under different terms and without source code.
+//
+// You can obtain a copy of the license here:
+// https://opensource.org/licenses/MIT
+
 package main
 
 import (
 	"fmt"
-	mydiff "github.com/miguelff/mydiff/go"
 	"log"
 	"os"
+
+	mydiff "github.com/miguelff/mydiff/go"
 
 	"github.com/skeema/tengo"
 	"github.com/urfave/cli"
@@ -16,6 +30,7 @@ const (
 	ESchemaNameNotProvided = iota + 1
 	EServInvalid
 	EMissingSchema
+	EUnkownFormatter
 )
 
 func main() {
@@ -59,8 +74,7 @@ func main() {
 
 	app.Action = func(c *cli.Context) error {
 		if c.GlobalBool("help") {
-			cli.ShowAppHelp(c)
-			return nil
+			return cli.ShowAppHelp(c)
 		}
 
 		if c.GlobalBool("version") {
@@ -94,16 +108,21 @@ func main() {
 			return cli.NewExitError(fmt.Sprintf("server2 doesn't contain schema %s. Error: %s", schema2, err.Error()), EMissingSchema)
 		}
 
+		formatter, err := mydiff.NewFormatter(c.GlobalString("difftype"))
+		if err != nil {
+			return cli.NewExitError(err, EUnkownFormatter)
+		}
+
 		if c.GlobalBool("reverse") {
 			tmp := to
 			to = from
 			from = tmp
 		}
 
-		formatter := Formatter.New(c.GlobalString("difftype"))
-		diff := Diff.New(from, to)
+		diff := mydiff.NewDiff(from, to)
 		result := formatter.Format(diff)
 		fmt.Print(result)
+		return nil
 	}
 
 	err := app.Run(os.Args)

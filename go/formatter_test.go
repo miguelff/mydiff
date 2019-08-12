@@ -13,5 +13,23 @@
 
 package mydiff
 
-// Version is the semantic version of mydiff
-const Version = "0.0.1"
+import (
+	"testing"
+
+	. "github.com/stretchr/testify/assert"
+)
+
+func TestNewFormatter_Existing(t *testing.T) {
+	formatter, _ := NewFormatter("sQl")
+	IsType(t, formatter, &SQLFormatter{})
+}
+
+func TestNewFormatter_NonExisting(t *testing.T) {
+	formatter, err := NewFormatter("foo")
+	Error(t, err, "fasfasdf")
+	Nil(t, formatter)
+}
+
+func TestSQLFormatter_Format(t *testing.T) {
+	t.Skip()
+}
