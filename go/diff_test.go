@@ -23,9 +23,6 @@ import (
 )
 
 func TestDiff(t *testing.T) {
-	dbTest := NewMySQLIntegrationTest()
-	dbTest.Setup(t)
-	defer dbTest.Teardown(t)
 	sql1 := []string{
 		`CREATE TABLE IF NOT EXISTS tasks (
 			id INT AUTO_INCREMENT,
@@ -48,7 +45,7 @@ func TestDiff(t *testing.T) {
 		)  ENGINE=INNODB;`,
 	}
 
-	s1Name, s2Name := dbTest.LoadSchemas(t, sql1, sql2)
+	s1Name, s2Name := TestCluster.LoadSchemas(t, sql1, sql2)
 	from := NewServer1Schema(s1Name)
 	to := NewServer2Schema(s2Name)
 
