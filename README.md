@@ -35,9 +35,9 @@ COPYRIGHT:
 
 * `make test` will run [golangci-lint](https://github.com/golangci/golangci-lint) and integration tests.
 
-* `make demo` load slightly different schemas dumps in two different servers and use `mydiff` the differences using the different command options.
+* `make demo` load slightly different schemas dumps in two different servers and use `mydiff` to compute the differences using a variety of command options.
 
-Both the tests and the demo will use docker-compose two spawn two mysql servers and thus mimic a real usage scenario.
+Both the tests and the demo will use docker-compose to spawn two mysql servers and thus mimic a real usage scenario.
     
 ## Design decisions and trade-offs
 
