@@ -115,13 +115,13 @@ func NewServer2Schema(name string) *tengo.Schema {
 }
 
 // RunDiff runs a diff between the two given schemas, applying the formatter and format options also given
-func RunDiff(t *testing.T, schema1 []string, schema2 []string, formatter Formatter, options FormatOptions) interface{} {
+func RunDiff(t *testing.T, schema1 []string, schema2 []string, formatter Formatter) interface{} {
 	t.Helper()
 	s1Name, s2Name := TestCluster.LoadSchemas(t, schema1, schema2)
 	from := NewServer1Schema(s1Name)
 	to := NewServer2Schema(s2Name)
 	diff := NewDiff(from, to)
-	return formatter.Format(diff, NoFormatOptions)
+	return formatter.Format(diff)
 }
 
 // newSchema returns the address of a new tengo.Schema described by the given

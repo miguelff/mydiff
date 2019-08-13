@@ -68,24 +68,36 @@ CREATE TABLE "owners" (
 `
 	expected = strings.ReplaceAll(expected, "\"", "`")
 	sqlFmt, _ := NewFormatter("sql")
-	sql := RunDiff(t, schema1, schema2, sqlFmt, NoFormatOptions)
+	sql := RunDiff(t, schema1, schema2, sqlFmt)
 
 	Equal(t, expected, sql)
 }
 
 func TestCompactFormatter_Format(t *testing.T) {
 	tests := map[string]struct {
-		schema1       []string
-		schema2       []string
-		formatOptions FormatOptions
-		expected      string
+		schema1  []string
+		schema2  []string
+		expected string
 	}{
 		//	AddColumn
 		"Add Column": {
-			schema1:       []string{},
-			schema2:       []string{},
-			formatOptions: NoFormatOptions,
-			expected:      "",
+			schema1: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT AUTO_INCREMENT,
+					title VARCHAR(255) NOT NULL,
+					PRIMARY KEY (id)
+				)  ENGINE=INNODB;`,
+			},
+			schema2: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT AUTO_INCREMENT,
+					title VARCHAR(255) NOT NULL,
+					owner_id INT,
+					PRIMARY KEY (id)
+				)  ENGINE=INNODB;`,
+			},
+			expected: "Differences found:" +
+				"- Table tasks differs: missing column owner_id on ",
 		},
 		//	DropColumn
 		//	AddIndex
@@ -105,7 +117,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			ghFmt, _ := NewFormatter("gh-ost")
-			result := RunDiff(t, test.schema1, test.schema2, ghFmt, test.formatOptions)
+			result := RunDiff(t, test.schema1, test.schema2, ghFmt)
 			ghostScripts := result.([]string)
 			assert.Equal(t, len(test.expected), len(ghostScripts))
 			for i, r := range ghostScripts {

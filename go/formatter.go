@@ -35,18 +35,10 @@ func existingFormatters() []string {
 	return keys
 }
 
-// FormatOptions is a raw string that can modify the behaviour
-// of a formatter. Different formatters will parse this
-// string and validate it
-type FormatOptions string
-
-// NoFormatOptions is used to pass no options
-const NoFormatOptions = FormatOptions("")
-
 // Formatter is the interface implemented by different
 // values that know how to format a diff
 type Formatter interface {
-	Format(diff *Diff, opts FormatOptions) interface{}
+	Format(diff *Diff) interface{}
 }
 
 // NewFormatter creates a new value of a specific formatter based
@@ -67,7 +59,7 @@ type SQLFormatter struct{}
 
 // Format formats a diff returning a slice of string commands, each of
 // which is an SQL ALTER, CREATE or DROP statement.
-func (f *SQLFormatter) Format(diff *Diff, _ FormatOptions) interface{} {
+func (f *SQLFormatter) Format(diff *Diff) interface{} {
 	return diff.Raw().String()
 }
 
@@ -75,6 +67,6 @@ func (f *SQLFormatter) Format(diff *Diff, _ FormatOptions) interface{} {
 type CompactFormatter struct{}
 
 // Format returns a string with the formatted diff
-func (f *CompactFormatter) Format(diff *Diff, opts FormatOptions) interface{} {
+func (f *CompactFormatter) Format(diff *Diff) interface{} {
 	return ""
 }

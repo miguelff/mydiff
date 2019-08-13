@@ -19,7 +19,6 @@ GLOBAL OPTIONS:
    --server1 value              connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.
    --server2 value              connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.
    -d value, --diff-type value  display differences in one of the following formats: [sql|compact] (default: "sql")
-   --diff-opts value            options to pass through to the different diff-type formatters
    -r, --reverse                show diff in reverse direction, from server2 to server1
    -v, --version                display version
    -h, --help                   display this help

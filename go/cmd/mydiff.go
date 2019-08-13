@@ -58,10 +58,6 @@ func main() {
 			Value: "sql",
 			Usage: "display differences in one of the following formats: [sql|gh-ost|ar]",
 		},
-		cli.StringFlag{
-			Name:  "diff-opts",
-			Usage: "options to pass through to the different diff-type formatters",
-		},
 		cli.BoolFlag{
 			Name:  "r, reverse",
 			Usage: "show diff in reverse direction, from server2 to server1",
@@ -117,8 +113,6 @@ func main() {
 			return cli.NewExitError(err, EUnkownFormatter)
 		}
 
-		formatOptions := c.GlobalString("diff-opts")
-
 		if c.GlobalBool("reverse") {
 			tmp := to
 			to = from
@@ -126,7 +120,7 @@ func main() {
 		}
 
 		diff := mydiff.NewDiff(from, to)
-		result := formatter.Format(diff, mydiff.FormatOptions(formatOptions))
+		result := formatter.Format(diff)
 		fmt.Print(result)
 		return nil
 	}
