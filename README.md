@@ -61,7 +61,7 @@ Also, because [skeema/tengo](github.com/skeema/tengo/) provides [tests to ensure
 
 ## License
 
-`mydiff` is licensed under the [MIT license](https://github.com/miguelff/mydiff/blob/master/LICENSE) 
+`mydiff` is licensed under the [MIT license](https://github.com/miguelff/mydiff/blob/master/LICENSE), and it uses [third-party libraries](https://github.com/miguelff/mydiff/blob/master/go.mod) that have their own licenses.
 
 ## Authors
 
