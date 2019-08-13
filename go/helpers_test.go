@@ -105,12 +105,12 @@ func (m *MySQLCluster) LoadSchemas(t *testing.T, sql1, sql2 []string) (schema1, 
 }
 
 // NewServer1Schema returns a tengo.Schema value denoted by the given name in the server1
-func NewServer1Schema(name string) *tengo.Schema {
+func NewServer1Schema(name string) *Schema {
 	return newSchema(S1DSN, name)
 }
 
 // NewServer2Schema returns a tengo.Schema value denoted by the given name in the server2
-func NewServer2Schema(name string) *tengo.Schema {
+func NewServer2Schema(name string) *Schema {
 	return newSchema(S2DSN, name)
 }
 
@@ -126,7 +126,7 @@ func RunDiff(t *testing.T, schema1 []string, schema2 []string, formatter Formatt
 
 // newSchema returns the address of a new tengo.Schema described by the given
 // DSN and schema names
-func newSchema(DSN, schema string) *tengo.Schema {
+func newSchema(DSN, schema string) *Schema {
 	i, err := tengo.NewInstance("mysql", DSN)
 	if err != nil {
 		log.Fatal(err)
@@ -135,7 +135,7 @@ func newSchema(DSN, schema string) *tengo.Schema {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return s
+	return NewSchema(s, i.Host)
 }
 
 // connect returns a *sql.DB connection to the given DSN

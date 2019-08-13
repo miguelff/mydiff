@@ -17,8 +17,6 @@ import (
 	"strings"
 	"testing"
 
-	"gotest.tools/assert"
-
 	. "github.com/stretchr/testify/assert"
 )
 
@@ -96,8 +94,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 					PRIMARY KEY (id)
 				)  ENGINE=INNODB;`,
 			},
-			expected: "Differences found:" +
-				"- Table tasks differs: missing column owner_id on ",
+			expected: "Table tasks differs: missing column owner_id on schema2_\\d+.127.0.0.1",
 		},
 		//	DropColumn
 		//	AddIndex
@@ -116,13 +113,9 @@ func TestCompactFormatter_Format(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			ghFmt, _ := NewFormatter("gh-ost")
-			result := RunDiff(t, test.schema1, test.schema2, ghFmt)
-			ghostScripts := result.([]string)
-			assert.Equal(t, len(test.expected), len(ghostScripts))
-			for i, r := range ghostScripts {
-				assert.Equal(t, test.expected[i], r)
-			}
+			cf, _ := NewFormatter("compact")
+			result := RunDiff(t, test.schema1, test.schema2, cf)
+			Regexp(t, test.expected, result)
 		})
 	}
 }

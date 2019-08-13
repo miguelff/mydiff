@@ -22,15 +22,30 @@ import (
 
 // Diff represents a diff between schemas
 type Diff struct {
-	from *tengo.Schema
-	to   *tengo.Schema
+	from *Schema
+	to   *Schema
 }
 
 // NewDiff creates a new diff from the given schemas
-func NewDiff(from, to *tengo.Schema) *Diff {
+func NewDiff(from, to *Schema) *Diff {
 	return &Diff{
 		from: from,
 		to:   to,
+	}
+}
+
+// Schema is a tengo.Schema enriched with host information
+type Schema struct {
+	*tengo.Schema
+	host string
+}
+
+// NewSchema creates a new Schema from a tengo.Schema and
+// the host information
+func NewSchema(s *tengo.Schema, host string) *Schema {
+	return &Schema{
+		Schema: s,
+		host:   host,
 	}
 }
 
@@ -54,7 +69,7 @@ func (d *Diff) Compute() []tengo.ObjectDiff {
 // Raw returns the tengo.SchemaDiff between the receiver's
 // from an to fields
 func (d *Diff) Raw() *tengo.SchemaDiff {
-	return tengo.NewSchemaDiff(d.from, d.to)
+	return tengo.NewSchemaDiff(d.from.Schema, d.to.Schema)
 }
 
 // Difference is an adapter to the tengo.ObjectDiff struct

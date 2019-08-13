@@ -14,8 +14,12 @@
 package mydiff
 
 import (
+	"bytes"
 	"fmt"
+	"log"
 	"strings"
+
+	"github.com/skeema/tengo"
 )
 
 // formatters contains a private map with the available
@@ -68,5 +72,53 @@ type CompactFormatter struct{}
 
 // Format returns a string with the formatted diff
 func (f *CompactFormatter) Format(diff *Diff) interface{} {
-	return ""
+	var res []string
+	ods := diff.Compute()
+	for _, od := range ods {
+		switch od.DiffType() {
+		case tengo.DiffTypeAlter:
+			res = append(res, f.formatAlter(od, diff)...)
+		}
+	}
+
+	return f.summarize(res)
+}
+
+func (f *CompactFormatter) formatAlter(diff tengo.ObjectDiff, context *Diff) []string {
+	clauses := diff.(*TableDiff).AlterClauses()
+	res := make([]string, len(clauses))
+	for i, c := range clauses {
+		res[i] = f.formatAlterClause(c, context)
+	}
+	return res
+}
+
+func (f *CompactFormatter) formatAlterClause(c tengo.TableAlterClause, context *Diff) string {
+	var s string
+	switch c.(type) {
+	case tengo.AddColumn:
+		s = f.formatAddColumn(c.(tengo.AddColumn), context)
+	default:
+		log.Panicf("Unexpected Table Alter Clause: %T", c)
+	}
+	return s
+}
+
+func (f *CompactFormatter) formatAddColumn(ac tengo.AddColumn, context *Diff) string {
+	cName := ac.Column.Name
+	tName := ac.Table.Name
+	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tName, cName, context.to.Name, context.to.host)
+}
+
+func (f *CompactFormatter) summarize(diffs []string) string {
+	var buffer bytes.Buffer
+	if count := len(diffs); count > 0 {
+		buffer.WriteString(fmt.Sprintf("Differences found (%d):\n", count))
+		for _, s := range diffs {
+			buffer.WriteString(fmt.Sprintf("\t- %s\n", s))
+		}
+	} else {
+		buffer.WriteString("No differences found")
+	}
+	return buffer.String()
 }

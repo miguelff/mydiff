@@ -99,11 +99,11 @@ func main() {
 		if err != nil {
 			return cli.NewExitError(fmt.Sprintf("server2 has to be a server DSN. Error: %s", err.Error()), EServInvalid)
 		}
-		from, err := server1.Schema(schema1)
+		fromSchema, err := server1.Schema(schema1)
 		if err != nil {
 			return cli.NewExitError(fmt.Sprintf("server1 doesn't contain schema %s. Error: %s", schema1, err.Error()), EMissingSchema)
 		}
-		to, err := server2.Schema(schema2)
+		toSchema, err := server2.Schema(schema2)
 		if err != nil {
 			return cli.NewExitError(fmt.Sprintf("server2 doesn't contain schema %s. Error: %s", schema2, err.Error()), EMissingSchema)
 		}
@@ -112,6 +112,9 @@ func main() {
 		if err != nil {
 			return cli.NewExitError(err, EUnkownFormatter)
 		}
+
+		from := mydiff.NewSchema(fromSchema, server1.Host)
+		to := mydiff.NewSchema(toSchema, server2.Host)
 
 		if c.GlobalBool("reverse") {
 			tmp := to
