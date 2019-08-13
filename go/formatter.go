@@ -21,7 +21,8 @@ import (
 // formatters contains a private map with the available
 // formatters
 var formatters map[string]Formatter = map[string]Formatter{
-	"sql": &SQLFormatter{},
+	"sql":    &SQLFormatter{},
+	"gh-ost": &GhostFormatter{},
 }
 
 // existingFormatters returns a slice of the existing formatters
@@ -34,10 +35,18 @@ func existingFormatters() []string {
 	return keys
 }
 
+// FormatOptions is a raw string that can modify the behaviour
+// of a formatter. Different formatters will parse this
+// string and validate it
+type FormatOptions string
+
+// NoFormatOptions is used to pass no options
+const NoFormatOptions = FormatOptions("")
+
 // Formatter is the interface implemented by different
 // values that know how to format a diff
 type Formatter interface {
-	Format(diff *Diff) interface{}
+	Format(diff *Diff, opts FormatOptions) interface{}
 }
 
 // NewFormatter creates a new value of a specific formatter based
@@ -58,6 +67,21 @@ type SQLFormatter struct{}
 
 // Format formats a diff returning a slice of string commands, each of
 // which is an SQL ALTER, CREATE or DROP statement.
-func (f *SQLFormatter) Format(diff *Diff) interface{} {
+func (f *SQLFormatter) Format(diff *Diff, _ FormatOptions) interface{} {
 	return diff.Raw().String()
+}
+
+// GhostFormatter formats a diff in a set of gh-ost scripts
+//
+// See also the following gh-ost resources:
+// * Cheatsheet: https://github.com/github/gh-ost/blob/master/doc/cheatsheet.md
+// * Supported DDL and Limitations: https://github.com/github/gh-ost/blob/master/doc/shared-key.md
+// * Command line flags: https://github.com/github/gh-ost/blob/master/doc/command-line-flags.md
+//
+type GhostFormatter struct{}
+
+// Format formats a diff returning a slice of string commands, each of
+// which is an SQL ALTER, CREATE or DROP statement.
+func (f *GhostFormatter) Format(diff *Diff, opts FormatOptions) interface{} {
+	return []string{}
 }

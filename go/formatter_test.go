@@ -17,6 +17,8 @@ import (
 	"strings"
 	"testing"
 
+	"gotest.tools/assert"
+
 	. "github.com/stretchr/testify/assert"
 )
 
@@ -69,4 +71,47 @@ CREATE TABLE "owners" (
 	sql := RunDiff(t, schema1, schema2, sqlFmt, NoFormatOptions)
 
 	Equal(t, expected, sql)
+}
+
+func TestGhostFormatter_Format(t *testing.T) {
+	tests := map[string]struct {
+		schema1       []string
+		schema2       []string
+		ghostOptions  FormatOptions
+		expectedGhost []string
+	}{
+		//	AddColumn
+		"Add Column": {
+			schema1:       []string{},
+			schema2:       []string{},
+			ghostOptions:  NoFormatOptions,
+			expectedGhost: nil,
+		},
+		//	DropColumn
+		//	AddIndex
+		//	DropIndex
+		//	AddForeignKey
+		//	DropForeignKey
+		//	RenameColumn
+		//	ModifyColumn
+		//	ChangeAutoIncrement
+		//	ChangeCharSet
+		//	ChangeCreateOptions
+		//	ChangeComment
+		//	ChangeStorageEngine
+		//  CreateTable
+		//  DropTable
+		// Shared key exceptions: https://github.com/github/gh-ost/blob/master/doc/shared-key.md#shared-key
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			ghFmt, _ := NewFormatter("gh-ost")
+			result := RunDiff(t, test.schema1, test.schema2, ghFmt, test.ghostOptions)
+			ghostScripts := result.([]string)
+			assert.Equal(t, len(test.expectedGhost), len(ghostScripts))
+			for i, r := range ghostScripts {
+				assert.Equal(t, test.expectedGhost[i], r)
+			}
+		})
+	}
 }
