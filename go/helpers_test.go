@@ -29,8 +29,9 @@ import (
 )
 
 const (
-	S1DSN = "root@tcp(127.0.0.1:33060)/"
-	S2DSN = "root@tcp(127.0.0.1:33062)/"
+	S1DSN       = "root@tcp(127.0.0.1:33060)/"
+	S2DSN       = "root@tcp(127.0.0.1:33062)/"
+	connTimeout = 5 * time.Second
 )
 
 var TestCluster *MySQLCluster
@@ -46,11 +47,11 @@ func init() {
 		i = uint64(log.WarnLevel)
 	}
 	log.SetLevel(log.Level(i))
-	mysql.SetLogger(log.StandardLogger())
+	_ = mysql.SetLogger(log.StandardLogger())
 
 	TestCluster = &MySQLCluster{
-		s1: connect(S1DSN, 5*time.Second),
-		s2: connect(S2DSN, 5*time.Second),
+		s1: connect(S1DSN, connTimeout),
+		s2: connect(S2DSN, connTimeout),
 	}
 }
 
