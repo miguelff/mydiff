@@ -21,8 +21,8 @@ import (
 // formatters contains a private map with the available
 // formatters
 var formatters map[string]Formatter = map[string]Formatter{
-	"sql":    &SQLFormatter{},
-	"gh-ost": &GhostFormatter{},
+	"sql":     &SQLFormatter{},
+	"compact": &CompactFormatter{},
 }
 
 // existingFormatters returns a slice of the existing formatters
@@ -71,17 +71,10 @@ func (f *SQLFormatter) Format(diff *Diff, _ FormatOptions) interface{} {
 	return diff.Raw().String()
 }
 
-// GhostFormatter formats a diff in a set of gh-ost scripts
-//
-// See also the following gh-ost resources:
-// * Cheatsheet: https://github.com/github/gh-ost/blob/master/doc/cheatsheet.md
-// * Supported DDL and Limitations: https://github.com/github/gh-ost/blob/master/doc/shared-key.md
-// * Command line flags: https://github.com/github/gh-ost/blob/master/doc/command-line-flags.md
-//
-type GhostFormatter struct{}
+// CompactFormatter formats a diff in a compact human-readable way
+type CompactFormatter struct{}
 
-// Format formats a diff returning a slice of string commands, each of
-// which is an SQL ALTER, CREATE or DROP statement.
-func (f *GhostFormatter) Format(diff *Diff, opts FormatOptions) interface{} {
-	return []string{}
+// Format returns a string with the formatted diff
+func (f *CompactFormatter) Format(diff *Diff, opts FormatOptions) interface{} {
+	return ""
 }

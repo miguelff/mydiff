@@ -73,19 +73,19 @@ CREATE TABLE "owners" (
 	Equal(t, expected, sql)
 }
 
-func TestGhostFormatter_Format(t *testing.T) {
+func TestCompactFormatter_Format(t *testing.T) {
 	tests := map[string]struct {
 		schema1       []string
 		schema2       []string
-		ghostOptions  FormatOptions
-		expectedGhost []string
+		formatOptions FormatOptions
+		expected      string
 	}{
 		//	AddColumn
 		"Add Column": {
 			schema1:       []string{},
 			schema2:       []string{},
-			ghostOptions:  NoFormatOptions,
-			expectedGhost: nil,
+			formatOptions: NoFormatOptions,
+			expected:      "",
 		},
 		//	DropColumn
 		//	AddIndex
@@ -101,16 +101,15 @@ func TestGhostFormatter_Format(t *testing.T) {
 		//	ChangeStorageEngine
 		//  CreateTable
 		//  DropTable
-		// Shared key exceptions: https://github.com/github/gh-ost/blob/master/doc/shared-key.md#shared-key
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			ghFmt, _ := NewFormatter("gh-ost")
-			result := RunDiff(t, test.schema1, test.schema2, ghFmt, test.ghostOptions)
+			result := RunDiff(t, test.schema1, test.schema2, ghFmt, test.formatOptions)
 			ghostScripts := result.([]string)
-			assert.Equal(t, len(test.expectedGhost), len(ghostScripts))
+			assert.Equal(t, len(test.expected), len(ghostScripts))
 			for i, r := range ghostScripts {
-				assert.Equal(t, test.expectedGhost[i], r)
+				assert.Equal(t, test.expected[i], r)
 			}
 		})
 	}
