@@ -59,5 +59,5 @@ type SQLFormatter struct{}
 // Format formats a diff returning a slice of string commands, each of
 // which is an SQL ALTER, CREATE or DROP statement.
 func (f *SQLFormatter) Format(diff *Diff) interface{} {
-	return diff.Compute()
+	return diff.Raw().String()
 }

@@ -37,8 +37,7 @@ func NewDiff(from, to *tengo.Schema) *Diff {
 // Compute computes the difference between the two schemas
 // returning an Difference object.
 func (d *Diff) Compute() []tengo.ObjectDiff {
-	diff := tengo.NewSchemaDiff(d.from, d.to)
-	objectDiffs := diff.ObjectDiffs()
+	objectDiffs := d.Raw().ObjectDiffs()
 
 	var res []tengo.ObjectDiff = make([]tengo.ObjectDiff, len(objectDiffs))
 	for i, od := range objectDiffs {
@@ -50,6 +49,12 @@ func (d *Diff) Compute() []tengo.ObjectDiff {
 		}
 	}
 	return res
+}
+
+// Raw returns the tengo.SchemaDiff between the receiver's
+// from an to fields
+func (d *Diff) Raw() *tengo.SchemaDiff {
+	return tengo.NewSchemaDiff(d.from, d.to)
 }
 
 // Difference is an adapter to the tengo.ObjectDiff struct

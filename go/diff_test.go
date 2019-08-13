@@ -14,10 +14,7 @@
 package mydiff
 
 import (
-	"strings"
 	"testing"
-
-	"github.com/skeema/tengo"
 
 	. "gotest.tools/assert"
 )
@@ -54,10 +51,7 @@ func TestDiff(t *testing.T) {
 	Equal(t, 2, len(objectDiffs))
 
 	alters := objectDiffs[0].(*TableDiff).AlterClauses()
-	Equal(t, "MODIFY COLUMN `id` bigint(20) NOT NULL AUTO_INCREMENT", alters[0].Clause(tengo.StatementModifiers{}))
-	Equal(t, "MODIFY COLUMN `title` varchar(255) NOT NULL", alters[1].Clause(tengo.StatementModifiers{}))
-	Equal(t, "ADD COLUMN `owner_id` int(11) DEFAULT NULL", alters[2].Clause(tengo.StatementModifiers{}))
-
-	create, _ := objectDiffs[1].(*TableDiff).Statement(tengo.StatementModifiers{})
-	Assert(t, strings.HasPrefix(create, "CREATE TABLE `owners`"))
+	Equal(t, 3, len(alters)) // modify tasks.id to make it bigint, title to make it a varchar, and add onwer_id\
+	create, _ := objectDiffs[1].(*TableDiff)
+	Equal(t, "owners", create.To.Name)
 }

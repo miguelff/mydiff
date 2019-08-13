@@ -14,6 +14,7 @@
 package mydiff
 
 import (
+	"strings"
 	"testing"
 
 	. "github.com/stretchr/testify/assert"
@@ -30,6 +31,47 @@ func TestNewFormatter_NonExisting(t *testing.T) {
 	Nil(t, formatter)
 }
 
+// TestSQLFormatter_Format won't have many additional tests, as
+// SQL output is provided by skeema/tengo, which is also properly
+// tested.
 func TestSQLFormatter_Format(t *testing.T) {
-	t.Skip()
+	sql1 := []string{
+		`CREATE TABLE IF NOT EXISTS tasks (
+			id INT AUTO_INCREMENT,
+			title CHAR(255) NOT NULL,
+			PRIMARY KEY (id)
+		)  ENGINE=INNODB;`,
+	}
+
+	sql2 := []string{
+		`CREATE TABLE IF NOT EXISTS tasks (
+			id BIGINT AUTO_INCREMENT,
+			title VARCHAR(255) NOT NULL,
+			owner_id INT,
+			PRIMARY KEY (id)
+		)  ENGINE=INNODB;`,
+		`CREATE TABLE IF NOT EXISTS owners (
+			id INT AUTO_INCREMENT,
+			name VARCHAR(255) NOT NULL,
+			PRIMARY KEY (id)
+		)  ENGINE=INNODB;`,
+	}
+
+	s1Name, s2Name := TestCluster.LoadSchemas(t, sql1, sql2)
+	from := NewServer1Schema(s1Name)
+	to := NewServer2Schema(s2Name)
+
+	diff := NewDiff(from, to)
+	sqlFmt, _ := NewFormatter("sql")
+	sql := sqlFmt.Format(diff)
+
+	expected := `ALTER TABLE "tasks" MODIFY COLUMN "id" bigint(20) NOT NULL AUTO_INCREMENT, MODIFY COLUMN "title" varchar(255) NOT NULL, ADD COLUMN "owner_id" int(11) DEFAULT NULL;
+CREATE TABLE "owners" (
+  "id" int(11) NOT NULL AUTO_INCREMENT,
+  "name" varchar(255) NOT NULL,
+  PRIMARY KEY ("id")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+`
+	expected = strings.ReplaceAll(expected, "\"", "`")
+	Equal(t, expected, sql)
 }
