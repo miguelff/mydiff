@@ -58,6 +58,7 @@ Also, because [skeema/tengo](github.com/skeema/tengo/) provides [tests to ensure
 - [ ] demo
 - [ ] unit tests
 - [ ] parallel comparisions for big schemas
+- [ ] published releases on GitHub
 
 ## License
 
