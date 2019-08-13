@@ -60,7 +60,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:  "diff-opts",
-			Usage: "options to pass through to the different difftype formatters",
+			Usage: "options to pass through to the different diff-type formatters",
 		},
 		cli.BoolFlag{
 			Name:  "r, reverse",
@@ -112,7 +112,7 @@ func main() {
 			return cli.NewExitError(fmt.Sprintf("server2 doesn't contain schema %s. Error: %s", schema2, err.Error()), EMissingSchema)
 		}
 
-		formatter, err := mydiff.NewFormatter(c.GlobalString("difftype"))
+		formatter, err := mydiff.NewFormatter(c.GlobalString("diff-type"))
 		if err != nil {
 			return cli.NewExitError(err, EUnkownFormatter)
 		}
