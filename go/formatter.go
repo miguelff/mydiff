@@ -79,8 +79,8 @@ type CompactFormatter struct{}
 // `combine([]line) []string` combines M formatted alters into N <=M
 // strings each of which will be a difference outputted by the formatter.
 type line struct {
-	Type interface{}
-	Text string
+	Origin interface{}
+	Text   string
 }
 
 // Format returns a string with the formatted diff
@@ -104,7 +104,7 @@ func (f *CompactFormatter) Format(diff *Diff) interface{} {
 // We only care about the last one, so we pop the previous line.
 func (f *CompactFormatter) combine(lines []line) (s []string) {
 	for _, fa := range lines {
-		switch fa.Type.(type) {
+		switch fa.Origin.(type) {
 		case tengo.AddForeignKey:
 			s = s[:len(s)-1]
 		}
@@ -144,28 +144,28 @@ func (f *CompactFormatter) formatAlterClause(c tengo.TableAlterClause, context *
 	switch c.(type) {
 	case tengo.AddColumn:
 		cd = line{
-			Text: f.formatAddColumn(c.(tengo.AddColumn), context, tableName),
-			Type: &tengo.AddColumn{},
+			Text:   f.formatAddColumn(c.(tengo.AddColumn), context, tableName),
+			Origin: c,
 		}
 	case tengo.DropColumn:
 		cd = line{
-			Text: f.formatDropColumn(c.(tengo.DropColumn), context, tableName),
-			Type: tengo.DropColumn{},
+			Text:   f.formatDropColumn(c.(tengo.DropColumn), context, tableName),
+			Origin: c,
 		}
 	case tengo.AddIndex:
 		cd = line{
-			Text: f.formatAddIndex(c.(tengo.AddIndex), context, tableName),
-			Type: tengo.AddIndex{},
+			Text:   f.formatAddIndex(c.(tengo.AddIndex), context, tableName),
+			Origin: c,
 		}
 	case tengo.DropIndex:
 		cd = line{
-			Text: f.formatDropIndex(c.(tengo.DropIndex), context, tableName),
-			Type: tengo.DropIndex{},
+			Text:   f.formatDropIndex(c.(tengo.DropIndex), context, tableName),
+			Origin: c,
 		}
 	case tengo.AddForeignKey:
 		cd = line{
-			Text: f.formatAddForeignKey(c.(tengo.AddForeignKey), context, tableName),
-			Type: tengo.AddForeignKey{},
+			Text:   f.formatAddForeignKey(c.(tengo.AddForeignKey), context, tableName),
+			Origin: c,
 		}
 	default:
 		log.Panicf("Unexpected Table Alter Clause: %T", c)
