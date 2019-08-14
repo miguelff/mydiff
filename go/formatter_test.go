@@ -75,7 +75,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 	tests := map[string]struct {
 		schema1  []string
 		schema2  []string
-		expected string
+		expected []string
 	}{
 		//	AddColumn
 		"Add Column": {
@@ -94,9 +94,34 @@ func TestCompactFormatter_Format(t *testing.T) {
 					PRIMARY KEY (id)
 				)  ENGINE=INNODB;`,
 			},
-			expected: "Table tasks differs: missing column owner_id on schema2_\\d+.127.0.0.1",
+			expected: []string{
+				"Differences found \\(1\\)",
+				"Table tasks differs: missing column owner_id on schema2_\\d+.127.0.0.1",
+			},
 		},
-		//	DropColumn
+
+		//	Drop column
+		"Drop Column": {
+			schema1: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT AUTO_INCREMENT,
+					title VARCHAR(255) NOT NULL,
+					owner_id INT,
+					PRIMARY KEY (id)
+				)  ENGINE=INNODB;`,
+			},
+			schema2: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT AUTO_INCREMENT,
+					title VARCHAR(255) NOT NULL,
+					PRIMARY KEY (id)
+				)  ENGINE=INNODB;`,
+			},
+			expected: []string{
+				"Differences found \\(1\\)",
+				"Table tasks differs: missing column owner_id on schema1_\\d+.127.0.0.1",
+			},
+		},
 		//	AddIndex
 		//	DropIndex
 		//	AddForeignKey
@@ -115,7 +140,9 @@ func TestCompactFormatter_Format(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			cf, _ := NewFormatter("compact")
 			result := RunDiff(t, test.schema1, test.schema2, cf)
-			Regexp(t, test.expected, result)
+			for _, expected := range test.expected {
+				Regexp(t, expected, result)
+			}
 		})
 	}
 }

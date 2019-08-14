@@ -85,29 +85,36 @@ func (f *CompactFormatter) Format(diff *Diff) interface{} {
 }
 
 func (f *CompactFormatter) formatAlter(diff tengo.ObjectDiff, context *Diff) []string {
-	clauses := diff.(*TableDiff).AlterClauses()
+	tableDiff := diff.(*TableDiff)
+	tableName := tableDiff.From.Name
+
+	clauses := tableDiff.AlterClauses()
 	res := make([]string, len(clauses))
 	for i, c := range clauses {
-		res[i] = f.formatAlterClause(c, context)
+		res[i] = f.formatAlterClause(c, context, tableName)
 	}
 	return res
 }
 
-func (f *CompactFormatter) formatAlterClause(c tengo.TableAlterClause, context *Diff) string {
+func (f *CompactFormatter) formatAlterClause(c tengo.TableAlterClause, context *Diff, tableName string) string {
 	var s string
 	switch c.(type) {
 	case tengo.AddColumn:
-		s = f.formatAddColumn(c.(tengo.AddColumn), context)
+		s = f.formatAddColumn(c.(tengo.AddColumn), context, tableName)
+	case tengo.DropColumn:
+		s = f.formatDropColumn(c.(tengo.DropColumn), context, tableName)
 	default:
 		log.Panicf("Unexpected Table Alter Clause: %T", c)
 	}
 	return s
 }
 
-func (f *CompactFormatter) formatAddColumn(ac tengo.AddColumn, context *Diff) string {
-	cName := ac.Column.Name
-	tName := ac.Table.Name
-	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tName, cName, context.to.Name, context.to.host)
+func (f *CompactFormatter) formatDropColumn(dc tengo.DropColumn, context *Diff, tableName string) string {
+	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tableName, dc.Column.Name, context.from.Name, context.from.host)
+}
+
+func (f *CompactFormatter) formatAddColumn(ac tengo.AddColumn, context *Diff, tableName string) string {
+	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tableName, ac.Column.Name, context.to.Name, context.to.host)
 }
 
 func (f *CompactFormatter) summarize(diffs []string) string {
