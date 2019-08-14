@@ -143,7 +143,12 @@ func (f *CompactFormatter) formatAddIndex(idx tengo.AddIndex, context *Diff, tab
 	}
 
 	idxName := idx.Index.Name
-	return fmt.Sprintf("Table %s differs: missing %s %s on %s.%s", tableName, idxType, idxName, context.from.Name, context.from.host)
+
+	colNames := make([]string, len(idx.Index.Columns))
+	for i, c := range idx.Index.Columns {
+		colNames[i] = c.Name
+	}
+	return fmt.Sprintf("Table %s differs: missing %s %s(%s) on %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.from.Name, context.from.host)
 }
 
 func (f *CompactFormatter) formatDropIndex(idx tengo.DropIndex, context *Diff, tableName string) string {
@@ -154,6 +159,11 @@ func (f *CompactFormatter) formatDropIndex(idx tengo.DropIndex, context *Diff, t
 		idxType = "KEY"
 	}
 
+	colNames := make([]string, len(idx.Index.Columns))
+	for i, c := range idx.Index.Columns {
+		colNames[i] = c.Name
+	}
+
 	idxName := idx.Index.Name
-	return fmt.Sprintf("Table %s differs: missing %s %s on %s.%s", tableName, idxType, idxName, context.to.Name, context.to.host)
+	return fmt.Sprintf("Table %s differs: missing %s %s(%s) on %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.to.Name, context.to.host)
 }

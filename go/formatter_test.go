@@ -136,12 +136,12 @@ func TestCompactFormatter_Format(t *testing.T) {
 					id BIGINT AUTO_INCREMENT,
 					title VARCHAR(255) NOT NULL,
 					PRIMARY KEY (id),
-					KEY unique_title (title)
+					KEY title_index (title)
 				)  ENGINE=INNODB;`,
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing KEY unique_title on schema1_\\d+.127.0.0.1",
+				"Table tasks differs: missing KEY title_index\\(title\\) on schema1_\\d+.127.0.0.1",
 			},
 		},
 		//	Add Unique Index
@@ -158,12 +158,12 @@ func TestCompactFormatter_Format(t *testing.T) {
 					id BIGINT AUTO_INCREMENT,
 					title VARCHAR(255) NOT NULL,
 					PRIMARY KEY (id),
-					UNIQUE KEY unique_title (title)
+					UNIQUE KEY title_index (title)
 				)  ENGINE=INNODB;`,
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing UNIQUE KEY unique_title on schema1_\\d+.127.0.0.1",
+				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) on schema1_\\d+.127.0.0.1",
 			},
 		},
 		//	Drop Index
@@ -173,7 +173,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 					id BIGINT AUTO_INCREMENT,
 					title VARCHAR(255) NOT NULL,
 					PRIMARY KEY (id),
-					KEY unique_title (title)
+					KEY title_index (title)
 				)  ENGINE=INNODB;`,
 			},
 			schema2: []string{
@@ -185,7 +185,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing KEY unique_title on schema2_\\d+.127.0.0.1",
+				"Table tasks differs: missing KEY title_index\\(title\\) on schema2_\\d+.127.0.0.1",
 			},
 		},
 		//	Drop Index
@@ -195,7 +195,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 					id BIGINT AUTO_INCREMENT,
 					title VARCHAR(255) NOT NULL,
 					PRIMARY KEY (id),
-					UNIQUE KEY unique_title (title)
+					UNIQUE KEY title_index (title)
 				)  ENGINE=INNODB;`,
 			},
 			schema2: []string{
@@ -207,7 +207,31 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing UNIQUE KEY unique_title on schema2_\\d+.127.0.0.1",
+				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) on schema2_\\d+.127.0.0.1",
+			},
+		},
+		//	Change Index
+		"Change Index": {
+			schema1: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT AUTO_INCREMENT,
+					title VARCHAR(255) NOT NULL,
+					PRIMARY KEY (id),
+					KEY title_index (title)
+				)  ENGINE=INNODB;`,
+			},
+			schema2: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT AUTO_INCREMENT,
+					title VARCHAR(255) NOT NULL,	
+					PRIMARY KEY (id),
+					UNIQUE KEY title_index (title)
+				)  ENGINE=INNODB;`,
+			},
+			expected: []string{
+				"Differences found \\(2\\)",
+				"Table tasks differs: missing KEY title_index\\(title\\) on schema2_\\d+.127.0.0.1",
+				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) on schema1_\\d+.127.0.0.1",
 			},
 		},
 		//  ChangeIndex
