@@ -84,6 +84,19 @@ func (f *CompactFormatter) Format(diff *Diff) interface{} {
 	return f.summarize(res)
 }
 
+func (f *CompactFormatter) summarize(diffs []string) string {
+	var buffer bytes.Buffer
+	if count := len(diffs); count > 0 {
+		buffer.WriteString(fmt.Sprintf("Differences found (%d):\n", count))
+		for _, s := range diffs {
+			buffer.WriteString(fmt.Sprintf("\t- %s\n", s))
+		}
+	} else {
+		buffer.WriteString("No differences found")
+	}
+	return buffer.String()
+}
+
 func (f *CompactFormatter) formatAlter(diff tengo.ObjectDiff, context *Diff) []string {
 	tableDiff := diff.(*TableDiff)
 	tableName := tableDiff.From.Name
@@ -103,29 +116,44 @@ func (f *CompactFormatter) formatAlterClause(c tengo.TableAlterClause, context *
 		s = f.formatAddColumn(c.(tengo.AddColumn), context, tableName)
 	case tengo.DropColumn:
 		s = f.formatDropColumn(c.(tengo.DropColumn), context, tableName)
+	case tengo.AddIndex:
+		s = f.formatAddIndex(c.(tengo.AddIndex), context, tableName)
+	case tengo.DropIndex:
+		s = f.formatDropIndex(c.(tengo.DropIndex), context, tableName)
 	default:
 		log.Panicf("Unexpected Table Alter Clause: %T", c)
 	}
 	return s
 }
 
-func (f *CompactFormatter) formatDropColumn(dc tengo.DropColumn, context *Diff, tableName string) string {
-	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tableName, dc.Column.Name, context.from.Name, context.from.host)
-}
-
 func (f *CompactFormatter) formatAddColumn(ac tengo.AddColumn, context *Diff, tableName string) string {
-	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tableName, ac.Column.Name, context.to.Name, context.to.host)
+	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tableName, ac.Column.Name, context.from.Name, context.from.host)
 }
 
-func (f *CompactFormatter) summarize(diffs []string) string {
-	var buffer bytes.Buffer
-	if count := len(diffs); count > 0 {
-		buffer.WriteString(fmt.Sprintf("Differences found (%d):\n", count))
-		for _, s := range diffs {
-			buffer.WriteString(fmt.Sprintf("\t- %s\n", s))
-		}
+func (f *CompactFormatter) formatDropColumn(dc tengo.DropColumn, context *Diff, tableName string) string {
+	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tableName, dc.Column.Name, context.to.Name, context.to.host)
+}
+
+func (f *CompactFormatter) formatAddIndex(idx tengo.AddIndex, context *Diff, tableName string) string {
+	var idxType string
+	if idx.Index.Unique {
+		idxType = "UNIQUE KEY"
 	} else {
-		buffer.WriteString("No differences found")
+		idxType = "KEY"
 	}
-	return buffer.String()
+
+	idxName := idx.Index.Name
+	return fmt.Sprintf("Table %s differs: missing %s %s on %s.%s", tableName, idxType, idxName, context.from.Name, context.from.host)
+}
+
+func (f *CompactFormatter) formatDropIndex(idx tengo.DropIndex, context *Diff, tableName string) string {
+	var idxType string
+	if idx.Index.Unique {
+		idxType = "UNIQUE KEY"
+	} else {
+		idxType = "KEY"
+	}
+
+	idxName := idx.Index.Name
+	return fmt.Sprintf("Table %s differs: missing %s %s on %s.%s", tableName, idxType, idxName, context.to.Name, context.to.host)
 }
