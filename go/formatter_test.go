@@ -77,7 +77,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 		schema2  []string
 		expected []string
 	}{
-		//	AddColumn
+		//	Add Column
 		"Add Column": {
 			schema1: []string{
 				`CREATE TABLE IF NOT EXISTS tasks (
@@ -100,7 +100,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 		},
 
-		//	Drop column
+		//	Drop Column
 		"Drop Column": {
 			schema1: []string{
 				`CREATE TABLE IF NOT EXISTS tasks (
@@ -188,7 +188,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 				"Table tasks differs: missing KEY title_index\\(title\\) on schema2_\\d+.127.0.0.1",
 			},
 		},
-		//	Drop Index
+		//	Drop Unique Index
 		"Drop Unique Index": {
 			schema1: []string{
 				`CREATE TABLE IF NOT EXISTS tasks (
@@ -234,7 +234,28 @@ func TestCompactFormatter_Format(t *testing.T) {
 				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) on schema1_\\d+.127.0.0.1",
 			},
 		},
-		//  ChangeIndex
+		//	Add Foreign Key
+		"Add Foreign Key": {
+			schema1: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT AUTO_INCREMENT,
+					parent_id BIGINT NOT NULL,
+					PRIMARY KEY (id)
+				)  ENGINE=INNODB;`,
+			},
+			schema2: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT AUTO_INCREMENT,
+					parent_id BIGINT NOT NULL,
+					PRIMARY KEY (id),
+					FOREIGN KEY tasks_ibfk_1(parent_id) REFERENCES tasks(id) ON UPDATE CASCADE
+				)  ENGINE=INNODB;`,
+			},
+			expected: []string{
+				"Differences found \\(1\\)",
+				"Table tasks differs: missing FOREIGN KEY tasks_ibfk_1\\(parent_id\\) REFERENCES tasks\\(id\\) on schema1_\\d+.127.0.0.1",
+			},
+		},
 		//	AddForeignKey
 		//	DropForeignKey
 		//	RenameColumn
