@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2019 Miguel Fernández Fernández
 //
-// This Source Code Form is subject to the terms of MIT License:
+// This Source Code Form is subject To the terms of MIT License:
 // A short and simple permissive license with conditions only
 // requiring preservation of copyright and license notices.
 // Licensed works, modifications, and larger works may be
@@ -95,7 +95,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing column owner_id in schema1_\\d+.127.0.0.1",
+				"Table tasks differs: missing column owner_id in schema1_\\d+.127.0.0.1:33060",
 			},
 		},
 		"Drop Column": {
@@ -116,7 +116,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing column owner_id in schema2_\\d+.127.0.0.1",
+				"Table tasks differs: missing column owner_id in schema2_\\d+.127.0.0.1:33062",
 			},
 		},
 		//	Add Index
@@ -138,7 +138,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing KEY title_index\\(title\\) in schema1_\\d+.127.0.0.1",
+				"Table tasks differs: missing KEY title_index\\(title\\) in schema1_\\d+.127.0.0.1:33060",
 			},
 		},
 		//	Add Unique Index
@@ -160,7 +160,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) in schema1_\\d+.127.0.0.1",
+				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) in schema1_\\d+.127.0.0.1:33060",
 			},
 		},
 		"Drop Index": {
@@ -181,7 +181,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing KEY title_index\\(title\\) in schema2_\\d+.127.0.0.1",
+				"Table tasks differs: missing KEY title_index\\(title\\) in schema2_\\d+.127.0.0.1:33062",
 			},
 		},
 		//	Drop Unique Index
@@ -203,7 +203,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) in schema2_\\d+.127.0.0.1",
+				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) in schema2_\\d+.127.0.0.1:33062",
 			},
 		},
 		//	Change Index
@@ -226,8 +226,8 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(2\\)",
-				"Table tasks differs: missing KEY title_index\\(title\\) in schema2_\\d+.127.0.0.1",
-				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) in schema1_\\d+.127.0.0.1",
+				"Table tasks differs: missing KEY title_index\\(title\\) in schema2_\\d+.127.0.0.1:33062",
+				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) in schema1_\\d+.127.0.0.1:33060",
 			},
 		},
 		"Add Foreign Key": {
@@ -248,7 +248,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing FOREIGN KEY tasks_ibfk_1\\(parent_id\\) REFERENCES tasks\\(id\\) in schema1_\\d+.127.0.0.1",
+				"Table tasks differs: missing FOREIGN KEY tasks_ibfk_1\\(parent_id\\) REFERENCES tasks\\(id\\) in schema1_\\d+.127.0.0.1:33060",
 			},
 		},
 		//	Drop Foreign Key
@@ -270,7 +270,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing FOREIGN KEY tasks_ibfk_1\\(parent_id\\) REFERENCES tasks\\(id\\) in schema2_\\d+.127.0.0.1",
+				"Table tasks differs: missing FOREIGN KEY tasks_ibfk_1\\(parent_id\\) REFERENCES tasks\\(id\\) in schema2_\\d+.127.0.0.1:33062",
 			},
 		},
 		"Rename column": {
@@ -290,7 +290,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: column parent_id differs in column type: bigint\\(20\\) NOT NULL in schema1_\\d+.127.0.0.1, int\\(11\\) DEFAULT '0' in schema2_\\d+.127.0.0.1",
+				"Table tasks differs: column parent_id differs in column type: bigint\\(20\\) NOT NULL in schema1_\\d+.127.0.0.1:33060, int\\(11\\) DEFAULT '0' in schema2_\\d+.127.0.0.1:33062",
 			},
 		},
 		"Change Auto Increment": {
@@ -308,7 +308,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: column id differs in column type: bigint\\(20\\) NOT NULL in schema1_\\d+.127.0.0.1, bigint\\(20\\) NOT NULL AUTO_INCREMENT in schema2_\\d+.127.0.0.1",
+				"Table tasks differs: column id differs in column type: bigint\\(20\\) NOT NULL in schema1_\\d+.127.0.0.1:33060, bigint\\(20\\) NOT NULL AUTO_INCREMENT in schema2_\\d+.127.0.0.1:33062",
 			},
 		},
 		"Change Charset": {
@@ -326,7 +326,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: encoding changed to DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci in schema2_\\d+.127.0.0.1",
+				"Table tasks differs: encoding changed To DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci in schema2_\\d+.127.0.0.1:33062",
 			},
 		},
 		"Drop Table": {
@@ -339,7 +339,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			schema2: []string{},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks is absent in schema2_\\d+.127.0.0.1",
+				"Table tasks is absent in schema2_\\d+.127.0.0.1:33062",
 			},
 		},
 		"Create Table": {
@@ -352,7 +352,34 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks is absent in schema1_\\d+.127.0.0.1",
+				"Table tasks is absent in schema1_\\d+.127.0.0.1:33060",
+			},
+		},
+		"Schema Migrations": {
+			schema1: []string{
+				`CREATE TABLE IF NOT EXISTS schema_migrations (
+					version VARCHAR(255) NOT NULL,
+					UNIQUE KEY version_key(version)
+				)  ENGINE=INNODB;`,
+				`INSERT INTO schema_migrations values (20190815193300);`,
+				`INSERT INTO schema_migrations values (20190817000000);`,
+			},
+
+			schema2: []string{
+				`CREATE TABLE IF NOT EXISTS schema_migrations (
+					version VARCHAR(255) NOT NULL,
+					UNIQUE KEY version_key(version)
+				)  ENGINE=INNODB;`,
+				`INSERT INTO schema_migrations values (20190815193300);`,
+				`INSERT INTO schema_migrations values (20190816000000);`,
+			},
+			expected: []string{
+				"Differences found \\(1\\)",
+				"\t- Some migrations are missing:",
+				"\t\t- 127.0.0.1:33060",
+				"\t\t\t- 20190816000000",
+				"\t\t- 127.0.0.1:33062",
+				"\t\t\t- 20190817000000",
 			},
 		},
 	}

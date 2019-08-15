@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2019 Miguel Fernández Fernández
 //
-// This Source Code Form is subject to the terms of MIT License:
+// This Source Code Form is subject To the terms of MIT License:
 // A short and simple permissive license with conditions only
 // requiring preservation of copyright and license notices.
 // Licensed works, modifications, and larger works may be
@@ -29,8 +29,8 @@ import (
 )
 
 const (
-	S1DSN       = "root@tcp(127.0.0.1:33060)/"
-	S2DSN       = "root@tcp(127.0.0.1:33062)/"
+	DSN1        = "root@tcp(127.0.0.1:33060)/"
+	DSN2        = "root@tcp(127.0.0.1:33062)/"
 	connTimeout = 60 * time.Second
 )
 
@@ -40,28 +40,28 @@ func init() {
 	log.SetFormatter(&log.TextFormatter{})
 	log.SetOutput(os.Stdout)
 
-	// set log level from env (1: Fatal, 5: debug)
+	// set log level From env (1: Fatal, 5: debug)
 	level := os.Getenv("LOG_LEVEL")
 	i, err := strconv.ParseUint(level, 10, 32)
 	if err != nil {
-		i = uint64(log.WarnLevel)
+		i = uint64(log.ErrorLevel)
 	}
 	log.SetLevel(log.Level(i))
 	_ = mysql.SetLogger(log.StandardLogger())
 
 	TestCluster = &MySQLCluster{
-		s1: connect(S1DSN, connTimeout),
-		s2: connect(S2DSN, connTimeout),
+		s1: connect(DSN1, connTimeout),
+		s2: connect(DSN2, connTimeout),
 	}
 }
 
-// MySQLCluster holds the connections to two servers
+// MySQLCluster holds the connections To two servers
 type MySQLCluster struct {
 	s1, s2 *sql.DB
 }
 
 // LoadSchemas will load sql1 and sql2 into the two servers under randomly generated
-// schema names. The names will be returned to refer to them later. This allows for
+// schema names. The names will be returned To refer To them later. This allows for
 // parallel test execution.
 func (m *MySQLCluster) LoadSchemas(t *testing.T, sql1, sql2 []string) (schema1, schema2 string) {
 	t.Helper()
@@ -105,13 +105,13 @@ func (m *MySQLCluster) LoadSchemas(t *testing.T, sql1, sql2 []string) (schema1, 
 }
 
 // NewServer1Schema returns a tengo.Schema value denoted by the given name in the server1
-func NewServer1Schema(name string) *Schema {
-	return newSchema(S1DSN, name)
+func NewServer1Schema(name string) *tengo.Schema {
+	return newSchema(DSN1, name)
 }
 
 // NewServer2Schema returns a tengo.Schema value denoted by the given name in the server2
-func NewServer2Schema(name string) *Schema {
-	return newSchema(S2DSN, name)
+func NewServer2Schema(name string) *tengo.Schema {
+	return newSchema(DSN2, name)
 }
 
 // RunDiff runs a diff between the two given schemas, applying the formatter and format options also given
@@ -120,13 +120,13 @@ func RunDiff(t *testing.T, schema1 []string, schema2 []string, formatter Formatt
 	s1Name, s2Name := TestCluster.LoadSchemas(t, schema1, schema2)
 	from := NewServer1Schema(s1Name)
 	to := NewServer2Schema(s2Name)
-	diff := NewDiff(from, to)
+	diff := NewDiff(DSN1, DSN2, from, to, true, "schema_migrations.version")
 	return formatter.Format(diff)
 }
 
 // newSchema returns the address of a new tengo.Schema described by the given
 // DSN and schema names
-func newSchema(DSN, schema string) *Schema {
+func newSchema(DSN, schema string) *tengo.Schema {
 	i, err := tengo.NewInstance("mysql", DSN)
 	if err != nil {
 		log.Fatal(err)
@@ -135,10 +135,10 @@ func newSchema(DSN, schema string) *Schema {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return NewSchema(s, i.Host)
+	return s
 }
 
-// connect returns a *sql.DB connection to the given DSN
+// connect returns a *sql.DB connection To the given DSN
 func connect(DSN string, timeout time.Duration) *sql.DB {
 	ticker := time.NewTicker(1 * time.Second)
 	timer := time.After(timeout)
@@ -152,7 +152,7 @@ func connect(DSN string, timeout time.Duration) *sql.DB {
 				return conn
 			}
 		case <-timer:
-			log.Fatalf("Timeout trying to connect to %s after %d seconds. Forgot to run `make db_up`?", DSN, timeout/1e9)
+			log.Fatalf("Timeout trying To connect To %s after %d seconds. Forgot To run `make db_up`?", DSN, timeout/1e9)
 			os.Exit(1)
 		}
 	}

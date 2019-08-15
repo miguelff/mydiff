@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2019 Miguel Fernández Fernández
 //
-// This Source Code Form is subject to the terms of MIT License:
+// This Source Code Form is subject To the terms of MIT License:
 // A short and simple permissive license with conditions only
 // requiring preservation of copyright and license notices.
 // Licensed works, modifications, and larger works may be
@@ -41,7 +41,7 @@ func existingFormatters() []string {
 }
 
 // Formatter is the interface implemented by different
-// values that know how to format a diff
+// values that know how To format a diff
 type Formatter interface {
 	Format(diff *Diff) interface{}
 }
@@ -71,8 +71,8 @@ func (f *SQLFormatter) Format(diff *Diff) interface{} {
 // CompactFormatter formats a diff in a compact human-readable way
 type CompactFormatter struct{}
 
-// line corresponds to a formatter alter clause, that not necessary corresponds
-// 1:1 to a schema difference. Some of these formatted alter clauses are omitted.
+// line corresponds To a formatter alter clause, that not necessary corresponds
+// 1:1 To a schema difference. Some of these formatted alter clauses are omitted.
 //
 // tengo.Diff exposes the differences as alter clauses, some differences
 // like the Added Foreign keys are represented by two alter clauses:
@@ -103,6 +103,8 @@ func (f *CompactFormatter) Format(diff *Diff) interface{} {
 			lines = append(lines, f.formatCreate(od.(*TableDiff), diff))
 		case tengo.DiffTypeDrop:
 			lines = append(lines, f.formatDrop(od.(*TableDiff), diff))
+		case DiffTypeMigrations:
+			lines = append(lines, f.formatMigrationsDiff(od.(*MigrationsDiff), diff))
 		}
 	}
 	return f.summarize(lines)
@@ -200,7 +202,7 @@ func (f *CompactFormatter) formatAlterClause(c tengo.TableAlterClause, context *
 			Origin: c,
 		}
 	case tengo.ChangeAutoIncrement:
-		// information to render an autoincrement in change came already in a previous
+		// information To render an autoincrement in change came already in a previous
 		// ModifyColumn alter clause
 		l = ignoredLine
 	default:
@@ -211,11 +213,11 @@ func (f *CompactFormatter) formatAlterClause(c tengo.TableAlterClause, context *
 }
 
 func (f *CompactFormatter) formatAddColumn(ac tengo.AddColumn, context *Diff, tableName string) string {
-	return fmt.Sprintf("Table %s differs: missing column %s in %s.%s", tableName, ac.Column.Name, context.from.Name, context.from.Host)
+	return fmt.Sprintf("Table %s differs: missing column %s in %s.%s", tableName, ac.Column.Name, context.From.Name, context.DSN1.Addr)
 }
 
 func (f *CompactFormatter) formatDropColumn(dc tengo.DropColumn, context *Diff, tableName string) string {
-	return fmt.Sprintf("Table %s differs: missing column %s in %s.%s", tableName, dc.Column.Name, context.to.Name, context.to.Host)
+	return fmt.Sprintf("Table %s differs: missing column %s in %s.%s", tableName, dc.Column.Name, context.To.Name, context.DSN2.Addr)
 }
 
 func (f *CompactFormatter) formatAddIndex(idx tengo.AddIndex, context *Diff, tableName string) string {
@@ -230,7 +232,7 @@ func (f *CompactFormatter) formatAddIndex(idx tengo.AddIndex, context *Diff, tab
 	for i, c := range idx.Index.Columns {
 		colNames[i] = c.Name
 	}
-	return fmt.Sprintf("Table %s differs: missing %s %s(%s) in %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.from.Name, context.from.Host)
+	return fmt.Sprintf("Table %s differs: missing %s %s(%s) in %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.From.Name, context.DSN1.Addr)
 }
 
 func (f *CompactFormatter) formatDropIndex(idx tengo.DropIndex, context *Diff, tableName string) string {
@@ -245,7 +247,7 @@ func (f *CompactFormatter) formatDropIndex(idx tengo.DropIndex, context *Diff, t
 		colNames[i] = c.Name
 	}
 	idxName := idx.Index.Name
-	return fmt.Sprintf("Table %s differs: missing %s %s(%s) in %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.to.Name, context.to.Host)
+	return fmt.Sprintf("Table %s differs: missing %s %s(%s) in %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.To.Name, context.DSN2.Addr)
 }
 
 func (f *CompactFormatter) formatAddForeignKey(key tengo.AddForeignKey, context *Diff, tableName string) string {
@@ -256,7 +258,7 @@ func (f *CompactFormatter) formatAddForeignKey(key tengo.AddForeignKey, context 
 	}
 	refName := key.ForeignKey.ReferencedTableName
 	refColNames := key.ForeignKey.ReferencedColumnNames
-	return fmt.Sprintf("Table %s differs: missing FOREIGN KEY %s(%s) REFERENCES %s(%s) in %s.%s", tableName, fkName, strings.Join(colNames, ", "), refName, strings.Join(refColNames, ","), context.from.Name, context.from.Host)
+	return fmt.Sprintf("Table %s differs: missing FOREIGN KEY %s(%s) REFERENCES %s(%s) in %s.%s", tableName, fkName, strings.Join(colNames, ", "), refName, strings.Join(refColNames, ","), context.From.Name, context.DSN1.Addr)
 }
 
 func (f *CompactFormatter) formatDropForeignKey(key tengo.DropForeignKey, context *Diff, tableName string) string {
@@ -267,7 +269,7 @@ func (f *CompactFormatter) formatDropForeignKey(key tengo.DropForeignKey, contex
 	}
 	refName := key.ForeignKey.ReferencedTableName
 	refColNames := key.ForeignKey.ReferencedColumnNames
-	return fmt.Sprintf("Table %s differs: missing FOREIGN KEY %s(%s) REFERENCES %s(%s) in %s.%s", tableName, fkName, strings.Join(colNames, ", "), refName, strings.Join(refColNames, ","), context.to.Name, context.to.Host)
+	return fmt.Sprintf("Table %s differs: missing FOREIGN KEY %s(%s) REFERENCES %s(%s) in %s.%s", tableName, fkName, strings.Join(colNames, ", "), refName, strings.Join(refColNames, ","), context.To.Name, context.DSN2.Addr)
 }
 
 func (f *CompactFormatter) formatModifyColumn(mc tengo.ModifyColumn, context *Diff, tableName string) string {
@@ -275,32 +277,52 @@ func (f *CompactFormatter) formatModifyColumn(mc tengo.ModifyColumn, context *Di
 	s1ColDef := f.colDef(mc.OldColumn)
 	s2ColDef := f.colDef(mc.NewColumn)
 	if s1ColDef != s2ColDef {
-		return fmt.Sprintf("Table %s differs: column %s differs in column type: %s in %s.%s, %s in %s.%s", tableName, colName, s1ColDef, context.from.Name, context.from.Host, s2ColDef, context.to.Name, context.to.Host)
+		return fmt.Sprintf("Table %s differs: column %s differs in column type: %s in %s.%s, %s in %s.%s", tableName, colName, s1ColDef, context.From.Name, context.DSN1.Addr, s2ColDef, context.To.Name, context.DSN2.Addr)
 	}
-	return fmt.Sprintf("Table %s differs: column %s AUTO_INCREMENT value differs between  %s.%s, and %s.%s", tableName, colName, context.from.Name, context.from.Host, context.to.Name, context.to.Host)
+	return fmt.Sprintf("Table %s differs: column %s AUTO_INCREMENT value differs between  %s.%s, and %s.%s", tableName, colName, context.From.Name, context.DSN1.Addr, context.To.Name, context.DSN2.Addr)
 }
 
 func (f *CompactFormatter) colDef(c *tengo.Column) string {
-	// TODO: get the flavor from the context, based on information gathered from the instances.
+	// TODO: get the flavor From the context, based on information gathered From the instances.
 	colDef := c.Definition(tengo.FlavorUnknown, nil)
 	colDef = strings.Replace(colDef, "`"+c.Name+"` ", "", 1)
 	return colDef
 }
 
 func (f *CompactFormatter) formatChangeCharset(set tengo.ChangeCharSet, context *Diff, tableName string) string {
-	return fmt.Sprintf("Table %s differs: encoding changed to %s in %s.%s", tableName, set.Clause(tengo.StatementModifiers{}), context.to.Name, context.to.Host)
+	return fmt.Sprintf("Table %s differs: encoding changed To %s in %s.%s", tableName, set.Clause(tengo.StatementModifiers{}), context.To.Name, context.DSN2.Addr)
 }
 
 func (f *CompactFormatter) formatCreate(td *TableDiff, context *Diff) line {
 	return line{
-		Text:   fmt.Sprintf("Table %s is absent in %s.%s", td.To.Name, context.from.Name, context.from.Host),
+		Text:   fmt.Sprintf("Table %s is absent in %s.%s", td.To.Name, context.From.Name, context.DSN1.Addr),
 		Origin: tengo.DiffTypeCreate,
 	}
 }
 
 func (f *CompactFormatter) formatDrop(td *TableDiff, context *Diff) line {
 	return line{
-		Text:   fmt.Sprintf("Table %s is absent in %s.%s", td.From.Name, context.to.Name, context.to.Host),
+		Text:   fmt.Sprintf("Table %s is absent in %s.%s", td.From.Name, context.To.Name, context.DSN2.Addr),
 		Origin: tengo.DiffTypeCreate,
+	}
+}
+
+func (f *CompactFormatter) formatMigrationsDiff(md *MigrationsDiff, context *Diff) line {
+	buf := bytes.NewBufferString("Some migrations are missing:\n")
+	if len(md.Missing1) > 0 {
+		buf.WriteString(fmt.Sprintf("\t\t- %s\n", md.Context.DSN1.Addr))
+		for _, m := range md.Missing1 {
+			buf.WriteString(fmt.Sprintf("\t\t\t- %s\n", m))
+		}
+	}
+	if len(md.Missing2) > 0 {
+		buf.WriteString(fmt.Sprintf("\t\t- %s\n", md.Context.DSN2.Addr))
+		for _, m := range md.Missing2 {
+			buf.WriteString(fmt.Sprintf("\t\t\t- %s\n", m))
+		}
+	}
+	return line{
+		Text:   buf.String(),
+		Origin: md.DiffType(),
 	}
 }
