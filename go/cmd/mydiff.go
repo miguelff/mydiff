@@ -59,11 +59,11 @@ func main() {
 			Usage: "display differences in one of the following formats: [sql|gh-ost|ar]",
 		},
 		cli.BoolFlag{
-			Name:  "--diff-migrations",
+			Name:  "diff-migrations",
 			Usage: "if the schema has a migrations table, compute its difference",
 		},
 		cli.StringFlag{
-			Name:  "--diff-migrations-column",
+			Name:  "diff-migrations-column",
 			Value: "schema_migrations.value",
 			Usage: "if --diff-migrations is enabled, this flag will determine which column values to compare in both schemas",
 		},

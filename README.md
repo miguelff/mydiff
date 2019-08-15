@@ -19,8 +19,8 @@ GLOBAL OPTIONS:
    --server1 value                   connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.
    --server2 value                   connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.
    -d value, --difftype value        display differences in one of the following formats: [sql|gh-ost|ar] (default: "sql")
-   ----diff-migrations               if the schema has a migrations table, compute its difference
-   ----diff-migrations-column value  if --diff-migrations is enabled, this flag will determine which column values to compare in both schemas (default: "schema_migrations.value")
+   --diff-migrations               if the schema has a migrations table, compute its difference
+   --diff-migrations-column value  if --diff-migrations is enabled, this flag will determine which column values to compare in both schemas (default: "schema_migrations.value")
    -r, --reverse                     show diff in reverse direction, from server2 to server1
    -v, --version                     display version
    -h, --help                        display this help
