@@ -107,6 +107,8 @@ func (f *CompactFormatter) combine(lines []line) (s []string) {
 		switch fa.Origin.(type) {
 		case tengo.AddForeignKey:
 			s = s[:len(s)-1]
+		case tengo.DropForeignKey:
+			s = s[:len(s)-1]
 		}
 		s = append(s, fa.Text)
 	}
@@ -167,6 +169,16 @@ func (f *CompactFormatter) formatAlterClause(c tengo.TableAlterClause, context *
 			Text:   f.formatAddForeignKey(c.(tengo.AddForeignKey), context, tableName),
 			Origin: c,
 		}
+	case tengo.DropForeignKey:
+		cd = line{
+			Text:   f.formatDropForeignKey(c.(tengo.DropForeignKey), context, tableName),
+			Origin: c,
+		}
+	case tengo.ModifyColumn:
+		cd = line{
+			Text:   f.formatModifyColumn(c.(tengo.ModifyColumn), context, tableName),
+			Origin: c,
+		}
 	default:
 		log.Panicf("Unexpected Table Alter Clause: %T", c)
 	}
@@ -174,11 +186,11 @@ func (f *CompactFormatter) formatAlterClause(c tengo.TableAlterClause, context *
 }
 
 func (f *CompactFormatter) formatAddColumn(ac tengo.AddColumn, context *Diff, tableName string) string {
-	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tableName, ac.Column.Name, context.from.Name, context.from.host)
+	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tableName, ac.Column.Name, context.from.Name, context.from.Host)
 }
 
 func (f *CompactFormatter) formatDropColumn(dc tengo.DropColumn, context *Diff, tableName string) string {
-	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tableName, dc.Column.Name, context.to.Name, context.to.host)
+	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tableName, dc.Column.Name, context.to.Name, context.to.Host)
 }
 
 func (f *CompactFormatter) formatAddIndex(idx tengo.AddIndex, context *Diff, tableName string) string {
@@ -193,7 +205,7 @@ func (f *CompactFormatter) formatAddIndex(idx tengo.AddIndex, context *Diff, tab
 	for i, c := range idx.Index.Columns {
 		colNames[i] = c.Name
 	}
-	return fmt.Sprintf("Table %s differs: missing %s %s(%s) on %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.from.Name, context.from.host)
+	return fmt.Sprintf("Table %s differs: missing %s %s(%s) on %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.from.Name, context.from.Host)
 }
 
 func (f *CompactFormatter) formatDropIndex(idx tengo.DropIndex, context *Diff, tableName string) string {
@@ -208,7 +220,7 @@ func (f *CompactFormatter) formatDropIndex(idx tengo.DropIndex, context *Diff, t
 		colNames[i] = c.Name
 	}
 	idxName := idx.Index.Name
-	return fmt.Sprintf("Table %s differs: missing %s %s(%s) on %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.to.Name, context.to.host)
+	return fmt.Sprintf("Table %s differs: missing %s %s(%s) on %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.to.Name, context.to.Host)
 }
 
 func (f *CompactFormatter) formatAddForeignKey(key tengo.AddForeignKey, context *Diff, tableName string) string {
@@ -219,5 +231,18 @@ func (f *CompactFormatter) formatAddForeignKey(key tengo.AddForeignKey, context 
 	}
 	refName := key.ForeignKey.ReferencedTableName
 	refColNames := key.ForeignKey.ReferencedColumnNames
-	return fmt.Sprintf("Table %s differs: missing FOREIGN KEY %s(%s) REFERENCES %s(%s) on %s.%s", tableName, fkName, strings.Join(colNames, ", "), refName, strings.Join(refColNames, ","), context.from.Name, context.from.host)
+	return fmt.Sprintf("Table %s differs: missing FOREIGN KEY %s(%s) REFERENCES %s(%s) on %s.%s", tableName, fkName, strings.Join(colNames, ", "), refName, strings.Join(refColNames, ","), context.from.Name, context.from.Host)
+}
+
+func (f *CompactFormatter) formatDropForeignKey(key tengo.DropForeignKey, context *Diff, tableName string) string {
+	fkName := key.ForeignKey.Name
+	colNames := make([]string, len(key.ForeignKey.Columns))
+	for i, c := range key.ForeignKey.Columns {
+		colNames[i] = c.Name
+	}
+	refName := key.ForeignKey.ReferencedTableName
+	refColNames := key.ForeignKey.ReferencedColumnNames
+	return fmt.Sprintf("Table %s differs: missing FOREIGN KEY %s(%s) REFERENCES %s(%s) on %s.%s", tableName, fkName, strings.Join(colNames, ", "), refName, strings.Join(refColNames, ","), context.to.Name, context.to.Host)
+}
+
 }

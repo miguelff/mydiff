@@ -34,18 +34,18 @@ func NewDiff(from, to *Schema) *Diff {
 	}
 }
 
-// Schema is a tengo.Schema enriched with host information
+// Schema is a tengo.Schema enriched with Host information
 type Schema struct {
 	*tengo.Schema
-	host string
+	Host string
 }
 
 // NewSchema creates a new Schema from a tengo.Schema and
-// the host information
+// the Host information
 func NewSchema(s *tengo.Schema, host string) *Schema {
 	return &Schema{
 		Schema: s,
-		host:   host,
+		Host:   host,
 	}
 }
 

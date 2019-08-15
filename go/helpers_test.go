@@ -31,7 +31,7 @@ import (
 const (
 	S1DSN       = "root@tcp(127.0.0.1:33060)/"
 	S2DSN       = "root@tcp(127.0.0.1:33062)/"
-	connTimeout = 5 * time.Second
+	connTimeout = 60 * time.Second
 )
 
 var TestCluster *MySQLCluster
