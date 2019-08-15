@@ -49,8 +49,9 @@ Also, because [skeema/tengo](github.com/skeema/tengo/) provides [tests to ensure
  - Ensuring `tengo.Diff` objects are parsed correctly to the different output formats. 
  - Ensuring the different formatters generate correct output.  
 
-## Missing features
+## Limitations and Missing features
 
+- [ ] Detecting changes in auto-increment values is not supported.
 - [ ] parse server connection descriptors in different formats that are more flexible than golang sqlx parser
 - [ ] demo
 - [ ] published releases on GitHub

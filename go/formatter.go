@@ -83,6 +83,13 @@ type line struct {
 	Text   string
 }
 
+// ignored line represents a line that is ignored by the formatter.
+// As an example when a column auto-increment varies between schemas,
+// tengo represents it with two alter clauses, one with the column
+// definition change, and the other one representing the own auto_increment
+// change. The latter is ignored by this formatter.
+var ignoredLine = line{}
+
 // Format returns a string with the formatted diff
 func (f *CompactFormatter) Format(diff *Diff) interface{} {
 	var lines []line
@@ -104,6 +111,9 @@ func (f *CompactFormatter) Format(diff *Diff) interface{} {
 // We only care about the last one, so we pop the previous line.
 func (f *CompactFormatter) combine(lines []line) (s []string) {
 	for _, fa := range lines {
+		if fa == ignoredLine {
+			continue
+		}
 		switch fa.Origin.(type) {
 		case tengo.AddForeignKey:
 			s = s[:len(s)-1]
@@ -179,6 +189,8 @@ func (f *CompactFormatter) formatAlterClause(c tengo.TableAlterClause, context *
 			Text:   f.formatModifyColumn(c.(tengo.ModifyColumn), context, tableName),
 			Origin: c,
 		}
+	case tengo.ChangeAutoIncrement:
+		cd = ignoredLine
 	default:
 		log.Panicf("Unexpected Table Alter Clause: %T", c)
 	}
@@ -249,7 +261,11 @@ func (f *CompactFormatter) formatModifyColumn(mc tengo.ModifyColumn, context *Di
 	colName := mc.OldColumn.Name
 	s1ColDef := f.colDef(mc.OldColumn)
 	s2ColDef := f.colDef(mc.NewColumn)
-	return fmt.Sprintf("Table %s differs: column %s differs in column type: %s in %s.%s, %s in %s.%s", tableName, colName, s1ColDef, context.from.Name, context.from.Host, s2ColDef, context.to.Name, context.to.Host)
+	if s1ColDef != s2ColDef {
+		return fmt.Sprintf("Table %s differs: column %s differs in column type: %s in %s.%s, %s in %s.%s", tableName, colName, s1ColDef, context.from.Name, context.from.Host, s2ColDef, context.to.Name, context.to.Host)
+	}
+	return fmt.Sprintf("Table %s differs: column %s AUTO_INCREMENT value differs between  %s.%s, and %s.%s", tableName, colName, context.from.Name, context.from.Host, context.to.Name, context.to.Host)
+
 }
 
 func (f *CompactFormatter) colDef(c *tengo.Column) string {

@@ -77,7 +77,6 @@ func TestCompactFormatter_Format(t *testing.T) {
 		schema2  []string
 		expected []string
 	}{
-		//	Add Column
 		"Add Column": {
 			schema1: []string{
 				`CREATE TABLE IF NOT EXISTS tasks (
@@ -99,8 +98,6 @@ func TestCompactFormatter_Format(t *testing.T) {
 				"Table tasks differs: missing column owner_id in schema1_\\d+.127.0.0.1",
 			},
 		},
-
-		//	Drop Column
 		"Drop Column": {
 			schema1: []string{
 				`CREATE TABLE IF NOT EXISTS tasks (
@@ -166,7 +163,6 @@ func TestCompactFormatter_Format(t *testing.T) {
 				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) in schema1_\\d+.127.0.0.1",
 			},
 		},
-		//	Drop Index
 		"Drop Index": {
 			schema1: []string{
 				`CREATE TABLE IF NOT EXISTS tasks (
@@ -234,7 +230,6 @@ func TestCompactFormatter_Format(t *testing.T) {
 				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) in schema1_\\d+.127.0.0.1",
 			},
 		},
-		//	Add Foreign Key
 		"Add Foreign Key": {
 			schema1: []string{
 				`CREATE TABLE IF NOT EXISTS tasks (
@@ -278,7 +273,6 @@ func TestCompactFormatter_Format(t *testing.T) {
 				"Table tasks differs: missing FOREIGN KEY tasks_ibfk_1\\(parent_id\\) REFERENCES tasks\\(id\\) in schema2_\\d+.127.0.0.1",
 			},
 		},
-		//	Modify column
 		"Rename column": {
 			schema1: []string{
 				`CREATE TABLE IF NOT EXISTS tasks (
@@ -299,8 +293,24 @@ func TestCompactFormatter_Format(t *testing.T) {
 				"Table tasks differs: column parent_id differs in column type: bigint\\(20\\) NOT NULL in schema1_\\d+.127.0.0.1, int\\(11\\) DEFAULT '0' in schema2_\\d+.127.0.0.1",
 			},
 		},
-		//	ModifyColumn
-		//	ChangeAutoIncrement
+		"Change Auto Increment": {
+			schema1: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT NOT NULL,	
+					PRIMARY KEY (id)
+				)  ENGINE=INNODB;`,
+			},
+			schema2: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT AUTO_INCREMENT,	
+					PRIMARY KEY (id)
+				)  ENGINE=INNODB AUTO_INCREMENT=123;`,
+			},
+			expected: []string{
+				"Differences found \\(1\\)",
+				"Table tasks differs: column id differs in column type: bigint\\(20\\) NOT NULL in schema1_\\d+.127.0.0.1, bigint\\(20\\) NOT NULL AUTO_INCREMENT in schema2_\\d+.127.0.0.1",
+			},
+		},
 		//	ChangeCharSet
 		//	ChangeCreateOptions
 		//	ChangeComment
