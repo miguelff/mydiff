@@ -16,8 +16,9 @@ package mydiff
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/skeema/tengo"
 )
@@ -83,7 +84,7 @@ type line struct {
 	Text   string
 }
 
-// ignored line represents a line that is ignored by the formatter.
+// ignoredLine represents a line that is ignored by the formatter.
 // As an example when a column auto-increment varies between schemas,
 // tengo represents it with two alter clauses, one with the column
 // definition change, and the other one representing the own auto_increment
@@ -98,6 +99,10 @@ func (f *CompactFormatter) Format(diff *Diff) interface{} {
 		switch od.DiffType() {
 		case tengo.DiffTypeAlter:
 			lines = append(lines, f.formatAlter(od, diff)...)
+		case tengo.DiffTypeCreate:
+			lines = append(lines, f.formatCreate(od.(*TableDiff), diff))
+		case tengo.DiffTypeDrop:
+			lines = append(lines, f.formatDrop(od.(*TableDiff), diff))
 		}
 	}
 	return f.summarize(lines)
@@ -189,15 +194,18 @@ func (f *CompactFormatter) formatAlterClause(c tengo.TableAlterClause, context *
 			Text:   f.formatModifyColumn(c.(tengo.ModifyColumn), context, tableName),
 			Origin: c,
 		}
-	case tengo.ChangeAutoIncrement:
-		l = ignoredLine
 	case tengo.ChangeCharSet:
 		l = line{
 			Text:   f.formatChangeCharset(c.(tengo.ChangeCharSet), context, tableName),
 			Origin: c,
 		}
+	case tengo.ChangeAutoIncrement:
+		// information to render an autoincrement in change came already in a previous
+		// ModifyColumn alter clause
+		l = ignoredLine
 	default:
-		log.Panicf("Unexpected Table Alter Clause: %T", c)
+		log.Errorf("Unexpected Table Alter Clause in Compact Formatter: %T. Ignoring", c)
+		l = ignoredLine
 	}
 	return l
 }
@@ -270,7 +278,6 @@ func (f *CompactFormatter) formatModifyColumn(mc tengo.ModifyColumn, context *Di
 		return fmt.Sprintf("Table %s differs: column %s differs in column type: %s in %s.%s, %s in %s.%s", tableName, colName, s1ColDef, context.from.Name, context.from.Host, s2ColDef, context.to.Name, context.to.Host)
 	}
 	return fmt.Sprintf("Table %s differs: column %s AUTO_INCREMENT value differs between  %s.%s, and %s.%s", tableName, colName, context.from.Name, context.from.Host, context.to.Name, context.to.Host)
-
 }
 
 func (f *CompactFormatter) colDef(c *tengo.Column) string {
@@ -282,4 +289,18 @@ func (f *CompactFormatter) colDef(c *tengo.Column) string {
 
 func (f *CompactFormatter) formatChangeCharset(set tengo.ChangeCharSet, context *Diff, tableName string) string {
 	return fmt.Sprintf("Table %s differs: encoding changed to %s in %s.%s", tableName, set.Clause(tengo.StatementModifiers{}), context.to.Name, context.to.Host)
+}
+
+func (f *CompactFormatter) formatCreate(td *TableDiff, context *Diff) line {
+	return line{
+		Text:   fmt.Sprintf("Table %s is absent in %s.%s", td.To.Name, context.from.Name, context.from.Host),
+		Origin: tengo.DiffTypeCreate,
+	}
+}
+
+func (f *CompactFormatter) formatDrop(td *TableDiff, context *Diff) line {
+	return line{
+		Text:   fmt.Sprintf("Table %s is absent in %s.%s", td.From.Name, context.to.Name, context.to.Host),
+		Origin: tengo.DiffTypeCreate,
+	}
 }

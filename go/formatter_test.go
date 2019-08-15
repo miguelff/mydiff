@@ -329,11 +329,32 @@ func TestCompactFormatter_Format(t *testing.T) {
 				"Table tasks differs: encoding changed to DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci in schema2_\\d+.127.0.0.1",
 			},
 		},
-		//	ChangeCreateOptions
-		//	ChangeComment
-		//	ChangeStorageEngine
-		//  CreateTable
-		//  DropTable
+		"Drop Table": {
+			schema1: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT AUTO_INCREMENT,	
+					PRIMARY KEY (id)
+				)  ENGINE=INNODB;`,
+			},
+			schema2: []string{},
+			expected: []string{
+				"Differences found \\(1\\)",
+				"Table tasks is absent in schema2_\\d+.127.0.0.1",
+			},
+		},
+		"Create Table": {
+			schema1: []string{},
+			schema2: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT AUTO_INCREMENT,	
+					PRIMARY KEY (id)
+				)  ENGINE=INNODB;`,
+			},
+			expected: []string{
+				"Differences found \\(1\\)",
+				"Table tasks is absent in schema1_\\d+.127.0.0.1",
+			},
+		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
