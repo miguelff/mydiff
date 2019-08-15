@@ -96,7 +96,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing column owner_id on schema1_\\d+.127.0.0.1",
+				"Table tasks differs: missing column owner_id in schema1_\\d+.127.0.0.1",
 			},
 		},
 
@@ -119,7 +119,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing column owner_id on schema2_\\d+.127.0.0.1",
+				"Table tasks differs: missing column owner_id in schema2_\\d+.127.0.0.1",
 			},
 		},
 		//	Add Index
@@ -141,7 +141,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing KEY title_index\\(title\\) on schema1_\\d+.127.0.0.1",
+				"Table tasks differs: missing KEY title_index\\(title\\) in schema1_\\d+.127.0.0.1",
 			},
 		},
 		//	Add Unique Index
@@ -163,7 +163,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) on schema1_\\d+.127.0.0.1",
+				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) in schema1_\\d+.127.0.0.1",
 			},
 		},
 		//	Drop Index
@@ -185,7 +185,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing KEY title_index\\(title\\) on schema2_\\d+.127.0.0.1",
+				"Table tasks differs: missing KEY title_index\\(title\\) in schema2_\\d+.127.0.0.1",
 			},
 		},
 		//	Drop Unique Index
@@ -207,7 +207,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) on schema2_\\d+.127.0.0.1",
+				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) in schema2_\\d+.127.0.0.1",
 			},
 		},
 		//	Change Index
@@ -230,8 +230,8 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(2\\)",
-				"Table tasks differs: missing KEY title_index\\(title\\) on schema2_\\d+.127.0.0.1",
-				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) on schema1_\\d+.127.0.0.1",
+				"Table tasks differs: missing KEY title_index\\(title\\) in schema2_\\d+.127.0.0.1",
+				"Table tasks differs: missing UNIQUE KEY title_index\\(title\\) in schema1_\\d+.127.0.0.1",
 			},
 		},
 		//	Add Foreign Key
@@ -253,7 +253,7 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing FOREIGN KEY tasks_ibfk_1\\(parent_id\\) REFERENCES tasks\\(id\\) on schema1_\\d+.127.0.0.1",
+				"Table tasks differs: missing FOREIGN KEY tasks_ibfk_1\\(parent_id\\) REFERENCES tasks\\(id\\) in schema1_\\d+.127.0.0.1",
 			},
 		},
 		//	Drop Foreign Key
@@ -275,7 +275,28 @@ func TestCompactFormatter_Format(t *testing.T) {
 			},
 			expected: []string{
 				"Differences found \\(1\\)",
-				"Table tasks differs: missing FOREIGN KEY tasks_ibfk_1\\(parent_id\\) REFERENCES tasks\\(id\\) on schema2_\\d+.127.0.0.1",
+				"Table tasks differs: missing FOREIGN KEY tasks_ibfk_1\\(parent_id\\) REFERENCES tasks\\(id\\) in schema2_\\d+.127.0.0.1",
+			},
+		},
+		//	Modify column
+		"Rename column": {
+			schema1: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT AUTO_INCREMENT,
+					parent_id BIGINT NOT NULL,
+					PRIMARY KEY (id)
+				)  ENGINE=INNODB;`,
+			},
+			schema2: []string{
+				`CREATE TABLE IF NOT EXISTS tasks (
+					id BIGINT AUTO_INCREMENT,
+					parent_id INT NULL DEFAULT 0,
+					PRIMARY KEY (id)
+				)  ENGINE=INNODB;`,
+			},
+			expected: []string{
+				"Differences found \\(1\\)",
+				"Table tasks differs: column parent_id differs in column type: bigint\\(20\\) NOT NULL in schema1_\\d+.127.0.0.1, int\\(11\\) DEFAULT '0' in schema2_\\d+.127.0.0.1",
 			},
 		},
 		//	ModifyColumn

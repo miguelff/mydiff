@@ -186,11 +186,11 @@ func (f *CompactFormatter) formatAlterClause(c tengo.TableAlterClause, context *
 }
 
 func (f *CompactFormatter) formatAddColumn(ac tengo.AddColumn, context *Diff, tableName string) string {
-	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tableName, ac.Column.Name, context.from.Name, context.from.Host)
+	return fmt.Sprintf("Table %s differs: missing column %s in %s.%s", tableName, ac.Column.Name, context.from.Name, context.from.Host)
 }
 
 func (f *CompactFormatter) formatDropColumn(dc tengo.DropColumn, context *Diff, tableName string) string {
-	return fmt.Sprintf("Table %s differs: missing column %s on %s.%s", tableName, dc.Column.Name, context.to.Name, context.to.Host)
+	return fmt.Sprintf("Table %s differs: missing column %s in %s.%s", tableName, dc.Column.Name, context.to.Name, context.to.Host)
 }
 
 func (f *CompactFormatter) formatAddIndex(idx tengo.AddIndex, context *Diff, tableName string) string {
@@ -205,7 +205,7 @@ func (f *CompactFormatter) formatAddIndex(idx tengo.AddIndex, context *Diff, tab
 	for i, c := range idx.Index.Columns {
 		colNames[i] = c.Name
 	}
-	return fmt.Sprintf("Table %s differs: missing %s %s(%s) on %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.from.Name, context.from.Host)
+	return fmt.Sprintf("Table %s differs: missing %s %s(%s) in %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.from.Name, context.from.Host)
 }
 
 func (f *CompactFormatter) formatDropIndex(idx tengo.DropIndex, context *Diff, tableName string) string {
@@ -220,7 +220,7 @@ func (f *CompactFormatter) formatDropIndex(idx tengo.DropIndex, context *Diff, t
 		colNames[i] = c.Name
 	}
 	idxName := idx.Index.Name
-	return fmt.Sprintf("Table %s differs: missing %s %s(%s) on %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.to.Name, context.to.Host)
+	return fmt.Sprintf("Table %s differs: missing %s %s(%s) in %s.%s", tableName, idxType, idxName, strings.Join(colNames, ", "), context.to.Name, context.to.Host)
 }
 
 func (f *CompactFormatter) formatAddForeignKey(key tengo.AddForeignKey, context *Diff, tableName string) string {
@@ -231,7 +231,7 @@ func (f *CompactFormatter) formatAddForeignKey(key tengo.AddForeignKey, context 
 	}
 	refName := key.ForeignKey.ReferencedTableName
 	refColNames := key.ForeignKey.ReferencedColumnNames
-	return fmt.Sprintf("Table %s differs: missing FOREIGN KEY %s(%s) REFERENCES %s(%s) on %s.%s", tableName, fkName, strings.Join(colNames, ", "), refName, strings.Join(refColNames, ","), context.from.Name, context.from.Host)
+	return fmt.Sprintf("Table %s differs: missing FOREIGN KEY %s(%s) REFERENCES %s(%s) in %s.%s", tableName, fkName, strings.Join(colNames, ", "), refName, strings.Join(refColNames, ","), context.from.Name, context.from.Host)
 }
 
 func (f *CompactFormatter) formatDropForeignKey(key tengo.DropForeignKey, context *Diff, tableName string) string {
@@ -242,7 +242,19 @@ func (f *CompactFormatter) formatDropForeignKey(key tengo.DropForeignKey, contex
 	}
 	refName := key.ForeignKey.ReferencedTableName
 	refColNames := key.ForeignKey.ReferencedColumnNames
-	return fmt.Sprintf("Table %s differs: missing FOREIGN KEY %s(%s) REFERENCES %s(%s) on %s.%s", tableName, fkName, strings.Join(colNames, ", "), refName, strings.Join(refColNames, ","), context.to.Name, context.to.Host)
+	return fmt.Sprintf("Table %s differs: missing FOREIGN KEY %s(%s) REFERENCES %s(%s) in %s.%s", tableName, fkName, strings.Join(colNames, ", "), refName, strings.Join(refColNames, ","), context.to.Name, context.to.Host)
 }
 
+func (f *CompactFormatter) formatModifyColumn(mc tengo.ModifyColumn, context *Diff, tableName string) string {
+	colName := mc.OldColumn.Name
+	s1ColDef := f.colDef(mc.OldColumn)
+	s2ColDef := f.colDef(mc.NewColumn)
+	return fmt.Sprintf("Table %s differs: column %s differs in column type: %s in %s.%s, %s in %s.%s", tableName, colName, s1ColDef, context.from.Name, context.from.Host, s2ColDef, context.to.Name, context.to.Host)
+}
+
+func (f *CompactFormatter) colDef(c *tengo.Column) string {
+	// TODO: get the flavor from the context, based on information gathered from the instances.
+	colDef := c.Definition(tengo.FlavorUnknown, nil)
+	colDef = strings.Replace(colDef, "`"+c.Name+"` ", "", 1)
+	return colDef
 }
