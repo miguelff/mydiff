@@ -51,7 +51,8 @@ Also, because [skeema/tengo](github.com/skeema/tengo/) provides [tests to ensure
 
 ## Limitations and Missing features
 
-- [ ] Detecting changes in auto-increment values is not supported.
+- [ ] Detecting changes in auto-increment initial values is not supported. This can be implemented by querying the auto increment values on the server directly, however this was not an initial requirement for the project and thus is left out of the scope of this first version of the tool.
+- [ ] Changes in encoding are detected, however the formatter only displays the encoding in the second schema being compared as tengo loses information about how it was before. This can be fixed by querying the DB on server1 and inspecting the table collation and encoding, but this is left out of the scope as the compact output informs about a mismatch in encoding pretty clearly. 
 - [ ] parse server connection descriptors in different formats that are more flexible than golang sqlx parser
 - [ ] demo
 - [ ] published releases on GitHub

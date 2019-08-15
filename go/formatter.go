@@ -152,49 +152,54 @@ func (f *CompactFormatter) formatAlter(diff tengo.ObjectDiff, context *Diff) []l
 }
 
 func (f *CompactFormatter) formatAlterClause(c tengo.TableAlterClause, context *Diff, tableName string) line {
-	var cd line
+	var l line
 	switch c.(type) {
 	case tengo.AddColumn:
-		cd = line{
+		l = line{
 			Text:   f.formatAddColumn(c.(tengo.AddColumn), context, tableName),
 			Origin: c,
 		}
 	case tengo.DropColumn:
-		cd = line{
+		l = line{
 			Text:   f.formatDropColumn(c.(tengo.DropColumn), context, tableName),
 			Origin: c,
 		}
 	case tengo.AddIndex:
-		cd = line{
+		l = line{
 			Text:   f.formatAddIndex(c.(tengo.AddIndex), context, tableName),
 			Origin: c,
 		}
 	case tengo.DropIndex:
-		cd = line{
+		l = line{
 			Text:   f.formatDropIndex(c.(tengo.DropIndex), context, tableName),
 			Origin: c,
 		}
 	case tengo.AddForeignKey:
-		cd = line{
+		l = line{
 			Text:   f.formatAddForeignKey(c.(tengo.AddForeignKey), context, tableName),
 			Origin: c,
 		}
 	case tengo.DropForeignKey:
-		cd = line{
+		l = line{
 			Text:   f.formatDropForeignKey(c.(tengo.DropForeignKey), context, tableName),
 			Origin: c,
 		}
 	case tengo.ModifyColumn:
-		cd = line{
+		l = line{
 			Text:   f.formatModifyColumn(c.(tengo.ModifyColumn), context, tableName),
 			Origin: c,
 		}
 	case tengo.ChangeAutoIncrement:
-		cd = ignoredLine
+		l = ignoredLine
+	case tengo.ChangeCharSet:
+		l = line{
+			Text:   f.formatChangeCharset(c.(tengo.ChangeCharSet), context, tableName),
+			Origin: c,
+		}
 	default:
 		log.Panicf("Unexpected Table Alter Clause: %T", c)
 	}
-	return cd
+	return l
 }
 
 func (f *CompactFormatter) formatAddColumn(ac tengo.AddColumn, context *Diff, tableName string) string {
@@ -273,4 +278,8 @@ func (f *CompactFormatter) colDef(c *tengo.Column) string {
 	colDef := c.Definition(tengo.FlavorUnknown, nil)
 	colDef = strings.Replace(colDef, "`"+c.Name+"` ", "", 1)
 	return colDef
+}
+
+func (f *CompactFormatter) formatChangeCharset(set tengo.ChangeCharSet, context *Diff, tableName string) string {
+	return fmt.Sprintf("Table %s differs: encoding changed to %s in %s.%s", tableName, set.Clause(tengo.StatementModifiers{}), context.to.Name, context.to.Host)
 }
