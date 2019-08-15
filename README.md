@@ -16,12 +16,14 @@ USAGE:
    mydiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket schema_name [schema_name in server2]
 
 GLOBAL OPTIONS:
-   --server1 value              connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.
-   --server2 value              connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.
-   -d value, --diff-type value  display differences in one of the following formats: [sql|compact] (default: "sql")
-   -r, --reverse                show diff in reverse direction, from server2 to server1
-   -v, --version                display version
-   -h, --help                   display this help
+   --server1 value                   connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.
+   --server2 value                   connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.
+   -d value, --difftype value        display differences in one of the following formats: [sql|gh-ost|ar] (default: "sql")
+   --diff-migrations               if the schema has a migrations table, compute its difference
+   --diff-migrations-column value  if --diff-migrations is enabled, this flag will determine which column values to compare in both schemas (default: "schema_migrations.value")
+   -r, --reverse                     show diff in reverse direction, from server2 to server1
+   -v, --version                     display version
+   -h, --help                        display this help
 
 COPYRIGHT:
    Copyright 2019 Miguel Fernández. Licensed under MIT license
@@ -53,9 +55,7 @@ Also, because [skeema/tengo](github.com/skeema/tengo/) provides [tests to ensure
 
 - [ ] Detecting changes in auto-increment initial values is not supported. This can be implemented by querying the auto increment values on the server directly, however this was not an initial requirement for the project and thus is left out of the scope of this first version of the tool.
 - [ ] Changes in encoding are detected, however the formatter only displays the encoding in the second schema being compared as tengo loses information about how it was before. This can be fixed by querying the DB on server1 and inspecting the table collation and encoding, but this is left out of the scope as the compact output informs about a mismatch in encoding pretty clearly. 
-- [ ] parse server connection descriptors in different formats that are more flexible than golang sqlx parser
-- [ ] demo
-- [ ] published releases on GitHub
+- [ ] Demo: TBC
 
 ## License
 

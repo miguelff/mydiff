@@ -59,6 +59,15 @@ func main() {
 			Usage: "display differences in one of the following formats: [sql|gh-ost|ar]",
 		},
 		cli.BoolFlag{
+			Name:  "diff-migrations",
+			Usage: "if the schema has a migrations table, compute its difference",
+		},
+		cli.StringFlag{
+			Name:  "diff-migrations-column",
+			Value: "schema_migrations.value",
+			Usage: "if --diff-migrations is enabled, this flag will determine which column values to compare in both schemas",
+		},
+		cli.BoolFlag{
 			Name:  "r, reverse",
 			Usage: "show diff in reverse direction, from server2 to server1",
 		},
@@ -99,11 +108,11 @@ func main() {
 		if err != nil {
 			return cli.NewExitError(fmt.Sprintf("server2 has to be a server DSN. Error: %s", err.Error()), EServInvalid)
 		}
-		fromSchema, err := server1.Schema(schema1)
+		from, err := server1.Schema(schema1)
 		if err != nil {
 			return cli.NewExitError(fmt.Sprintf("server1 doesn't contain schema %s. Error: %s", schema1, err.Error()), EMissingSchema)
 		}
-		toSchema, err := server2.Schema(schema2)
+		to, err := server2.Schema(schema2)
 		if err != nil {
 			return cli.NewExitError(fmt.Sprintf("server2 doesn't contain schema %s. Error: %s", schema2, err.Error()), EMissingSchema)
 		}
@@ -112,9 +121,8 @@ func main() {
 		if err != nil {
 			return cli.NewExitError(err, EUnkownFormatter)
 		}
-
-		from := mydiff.NewSchema(fromSchema, server1.Host)
-		to := mydiff.NewSchema(toSchema, server2.Host)
+		includeMigrations := c.GlobalBool("diff-migrations")
+		migrationsCol := c.GlobalString("diff-migrations-column")
 
 		if c.GlobalBool("reverse") {
 			tmp := to
@@ -122,7 +130,7 @@ func main() {
 			from = tmp
 		}
 
-		diff := mydiff.NewDiff(from, to)
+		diff := mydiff.NewDiff(server1.BaseDSN, server2.BaseDSN, from, to, includeMigrations, migrationsCol)
 		result := formatter.Format(diff)
 		fmt.Print(result)
 		return nil

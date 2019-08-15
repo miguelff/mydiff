@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2019 Miguel Fernández Fernández
 //
-// This Source Code Form is subject to the terms of MIT License:
+// This Source Code Form is subject To the terms of MIT License:
 // A short and simple permissive license with conditions only
 // requiring preservation of copyright and license notices.
 // Licensed works, modifications, and larger works may be
@@ -14,39 +14,40 @@
 package mydiff
 
 import (
-	"reflect"
-	"unsafe"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/skeema/tengo"
 )
 
-// Diff represents a diff between schemas
+// A integer denoting our custom diff type for schema migrations
+// We add 10^6 to iota, to avoid collisions with tengo diff types.
+const DiffTypeMigrations = 10 ^ 6 + iota
+
+// Diff encapsulates the data necessary to compute a diff between two schemas
+// in servers denoted by DSN1, and DSN2
 type Diff struct {
-	from *Schema
-	to   *Schema
+	DSN1, DSN2        *ParsedDSN
+	From, To          *tengo.Schema
+	IncludeMigrations bool
+	MigrationsCol     string
 }
 
-// NewDiff creates a new diff from the given schemas
-func NewDiff(from, to *Schema) *Diff {
+// NewDiff creates a new Diff
+func NewDiff(DSN1, DSN2 string, from, to *tengo.Schema, includeMigrations bool, migrationsCol string) *Diff {
 	return &Diff{
-		from: from,
-		to:   to,
+		DSN1:              ParseDSN(DSN1),
+		DSN2:              ParseDSN(DSN2),
+		From:              from,
+		To:                to,
+		IncludeMigrations: includeMigrations,
+		MigrationsCol:     migrationsCol,
 	}
 }
 
-// Schema is a tengo.Schema enriched with Host information
-type Schema struct {
-	*tengo.Schema
-	Host string
-}
-
-// NewSchema creates a new Schema from a tengo.Schema and
-// the Host information
-func NewSchema(s *tengo.Schema, host string) *Schema {
-	return &Schema{
-		Schema: s,
-		Host:   host,
-	}
+// Raw returns the tengo.SchemaDiff between the receiver's
+// From an To fields
+func (d *Diff) Raw() *tengo.SchemaDiff {
+	return tengo.NewSchemaDiff(d.From, d.To)
 }
 
 // Compute computes the difference between the two schemas
@@ -63,52 +64,17 @@ func (d *Diff) Compute() []tengo.ObjectDiff {
 			res[i] = od
 		}
 	}
+
+	if d.IncludeMigrations {
+		migrationsDiff, err := NewMigrationsDiff(d)
+		if err != nil {
+			log.Warningf("Error while computing the migrations diff: %s", err)
+		} else {
+			if !migrationsDiff.IsEmpty() {
+				res = append(res, migrationsDiff)
+			}
+		}
+	}
+
 	return res
-}
-
-// Raw returns the tengo.SchemaDiff between the receiver's
-// from an to fields
-func (d *Diff) Raw() *tengo.SchemaDiff {
-	return tengo.NewSchemaDiff(d.from.Schema, d.to.Schema)
-}
-
-// Difference is an adapter to the tengo.ObjectDiff struct
-// that exposes the alterClauses field, in order to be
-// visitable by any formatter object.
-//
-// There's no reason why tengo.TableDiff.alterClauses is not
-// exported, and a new ticket should be opened in skeema/tengo
-// to export this field, and eventually remove this code, which
-// is unsafe if the dependency on skeema/tengo is upgraded.
-type TableDiff struct {
-	*tengo.TableDiff
-}
-
-// AlterClauses returns the unexported alterClauses field of the
-// adapted tengo.tableDiff so a Formatter can visit them to
-// generate instructions for amending the schemas, not only in SQL
-// but in the different formats supported by mydiff.
-//
-// TableAlterClause can be one of:
-//	AddColumn
-//	DropColumn
-//	AddIndex
-//	DropIndex
-//	AddForeignKey
-//	DropForeignKey
-//	RenameColumn
-//	ModifyColumn
-//	ChangeAutoIncrement
-//	ChangeCharSet
-//	ChangeCreateOptions
-//	ChangeComment
-//	ChangeStorageEngine
-func (d *TableDiff) AlterClauses() []tengo.TableAlterClause {
-	val := reflect.ValueOf(d.TableDiff).Elem()
-	f := val.FieldByName("alterClauses")
-
-	// As said above, There's no reason why tengo.TableDiff.alterClauses
-	// is not exported, but until that's fixed in tengo, we return an unsafe
-	// reference to the unexported field.
-	return *reflect.NewAt(f.Type(), unsafe.Pointer(f.UnsafeAddr())).Interface().(*[]tengo.TableAlterClause)
 }

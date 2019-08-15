@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2019 Miguel Fernández Fernández
 //
-// This Source Code Form is subject to the terms of MIT License:
+// This Source Code Form is subject To the terms of MIT License:
 // A short and simple permissive license with conditions only
 // requiring preservation of copyright and license notices.
 // Licensed works, modifications, and larger works may be
@@ -26,6 +26,12 @@ func TestDiff(t *testing.T) {
 			title CHAR(255) NOT NULL,
 			PRIMARY KEY (id)
 		)  ENGINE=INNODB;`,
+		`CREATE TABLE IF NOT EXISTS schema_migrations (
+			version VARCHAR(255) NOT NULL,
+			UNIQUE KEY version_key(version)
+		)  ENGINE=INNODB;`,
+		`INSERT INTO schema_migrations values (20190815193300);`,
+		`INSERT INTO schema_migrations values (20190817000000);`,
 	}
 
 	sql2 := []string{
@@ -40,18 +46,44 @@ func TestDiff(t *testing.T) {
 			name VARCHAR(255) NOT NULL,
 			PRIMARY KEY (id)
 		)  ENGINE=INNODB;`,
+		`CREATE TABLE IF NOT EXISTS schema_migrations (
+			version VARCHAR(255) NOT NULL,
+			UNIQUE KEY version_key(version)
+		)  ENGINE=INNODB;`,
+		`INSERT INTO schema_migrations values (20190815193300);`,
+		`INSERT INTO schema_migrations values (20190816000000);`,
 	}
 
 	s1Name, s2Name := TestCluster.LoadSchemas(t, sql1, sql2)
 	from := NewServer1Schema(s1Name)
 	to := NewServer2Schema(s2Name)
 
-	diff := NewDiff(from, to)
+	diff := NewDiff(DSN1, DSN2, from, to, true, "schema_migrations.version")
 	objectDiffs := diff.Compute()
-	Equal(t, 2, len(objectDiffs))
+	Equal(t, 3, len(objectDiffs))
 
 	alters := objectDiffs[0].(*TableDiff).AlterClauses()
-	Equal(t, 3, len(alters)) // modify tasks.id to make it bigint, title to make it a varchar, and add onwer_id\
+	Equal(t, 3, len(alters)) // modify tasks.id To make it bigint, title To make it a varchar, and add onwer_id\
+
 	create, _ := objectDiffs[1].(*TableDiff)
 	Equal(t, "owners", create.To.Name)
+	migrations, _ := objectDiffs[2].(*MigrationsDiff)
+
+	Equal(t, 1, len(migrations.Missing1))
+	Equal(t, "20190816000000", migrations.Missing1[0])
+
+	Equal(t, 1, len(migrations.Missing1))
+	Equal(t, "20190817000000", migrations.Missing2[0])
+}
+
+func TestDiff_DontDiffMigrations(t *testing.T) {
+	t.Skip()
+}
+
+func TestDiff_MissingMigrations(t *testing.T) {
+	t.Skip()
+}
+
+func TestDiff_WrongMigrationsColumn(t *testing.T) {
+	t.Skip()
 }
