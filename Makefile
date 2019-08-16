@@ -28,3 +28,7 @@ db_down:
 db_up:
 	docker-compose up -d --build
 
+.PHONY: demo
+demo: db_up
+	ruby demo.rb
+

@@ -54,7 +54,7 @@ func main() {
 			Usage: "connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.",
 		},
 		cli.StringFlag{
-			Name:  "d, difftype",
+			Name:  "d, diff-type",
 			Value: "sql",
 			Usage: "display differences in one of the following formats: [sql|gh-ost|ar]",
 		},
