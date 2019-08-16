@@ -61,7 +61,7 @@ func NewMigrationsDiff(d *Diff) (m *MigrationsDiff, err error) {
 	dsn1.DBName = d.From.Name
 	migrations1, err := m.existingMigrations(dsn1, col, table)
 	if err != nil {
-		log.Warningf("Cannot retrieve migrations from %s.%s in %s/%s. Error: %s", col, table, dsn1.Addr, dsn1.DBName, err)
+		log.Warningf("Cannot retrieve migrations from %s.%s in %s/%s. Error: %s", table, col, dsn1.Addr, dsn1.DBName, err)
 		return
 	}
 
@@ -69,7 +69,7 @@ func NewMigrationsDiff(d *Diff) (m *MigrationsDiff, err error) {
 	dsn2.DBName = d.To.Name
 	migrations2, err := m.existingMigrations(dsn2, col, table)
 	if err != nil {
-		log.Warningf("Cannot retrieve migrations from %s.%s in %s/%s. Error: %s", col, table, dsn1.Addr, dsn1.DBName, err)
+		log.Warningf("Cannot retrieve migrations from %s.%s in %s/%s. Error: %s", table, col, dsn1.Addr, dsn1.DBName, err)
 		return
 	}
 

@@ -156,5 +156,21 @@ func connect(DSN string, timeout time.Duration) *sql.DB {
 			os.Exit(1)
 		}
 	}
+}
 
+// Mock writer is a writer that stores the
+// written bytes as strings in its Entries fields
+type MockWriter struct {
+	Entries []string
+}
+
+// NewMockWriter returns the address of a new MockWriter value
+func NewMockWriter() *MockWriter {
+	return &MockWriter{Entries: []string{}}
+}
+
+// Write stores p as a string in Entries
+func (w *MockWriter) Write(p []byte) (int, error) {
+	w.Entries = append(w.Entries, string(p))
+	return len(p), nil
 }
