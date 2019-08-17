@@ -1,20 +1,21 @@
 sudo: required
 language: go
 go:
-  - "1.11.x"
+- 1.12.x
 services:
-  - docker
-
+- docker
 env:
+  matrix:
   - GO111MODULE=on
-
+  global:
+    secure: QE4SY3nO0nCl1hy7tZYPPMSxCI56AtuDxna706agvOr6czapwfhozHWMTLpgpjoMt8+08T1FzH/UJ8aKzWgBOzt5TJDHPbr8GpCOnZK8fYXiRPf2dLxl+Yow6+Fhzrtm2P1Aq0QHmpdctFYiet2DqdNpywotGp6VSpcf618oRdTAMhWyRMFHWW5W6ifk3QeZEGJFHHZx9Ottif67sawvlh8j3Qr3dDW733exFyCm+OntT/RsyrgcLNRvXE9bk/JL9hfIqn3X7WaS/dssg2a3jehKZees5vjNZIn/rrAmh7yo0xpfZ4GLEhlWal/alNrYWni4W/CO/DnIV1Bg6P57N08lEPecBmWp5ZlRqz4h0+g6Yy6bhugMlzc/vb501zr9j8Wve0zMvXDGzJFUqDpMuB1BwaqDqyqJh70p/BL575ixkVae4MxyMAFjktONdApyy4jEVFZeg9xu/JF1++wzhhtDObpXByML+QuuO0WtQXIFPLCLkqwQmwqkYVUWDRtlj49deeyzPMzqhJZkPy9s+3scKVU0updjWPt4II24Yt7emKSP5TbWY2wiYIa1slRbA5yy8mifWnEQGWMTtaQWqx2dvHCMdx+3jKVr2SwfCPeyWC6SdFWdOw6c2MEjDTPeckC23h3Qz5jUZzX2Swmt2IT2fohmdKFTc/v5cVg3yjA=
 notifications:
   email: false
-
-install: true
-
+install:
+- go get golang.org/x/tools/cmd/cover
+- go get github.com/mattn/goveralls
 before_install:
-  - make db_up
-
+- make db_up
 script:
-  - make test
+- go test -v -covermode=count -coverprofile=coverage.out
+- $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
