@@ -13,11 +13,11 @@ NAME:
    mydiff - Compute the differences between two MySQL schemas
 
 USAGE:
-   mydiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket schema_name
+   mydiff --server1=user:pass@tcp(host:port)/ --server2=user:pass@tcp(host:port)/ GLOBAL OPTIONS schema_name
 
 GLOBAL OPTIONS:
-   --server1 value                 connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.
-   --server2 value                 connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.
+   --server1 value                 connection information for second server in the form of a DSN (<user>[:<password>]@tcp(<host>[:<port>]))
+   --server2 value                 connection information for second server in the form of a DSN (<user>[:<password>]@tcp(<host>[:<port>]))
    -d value, --diff-type value     display differences in one of the following formats: [sql|compact] (default: "compact")
    --diff-migrations               if the schema has a migrations table, compute its difference. Works only with compact formatting
    --diff-migrations-column value  if --diff-migrations is enabled, this flag will determine which column values to compare in both schemas (default: "schema_migrations.version")

@@ -39,7 +39,7 @@ func main() {
 	app.Version = mydiff.Version
 	app.Usage = "Compute the differences between two MySQL schemas"
 	app.Copyright = "Copyright 2019 Miguel Fernández. Licensed under MIT license"
-	app.UsageText = "mydiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket schema_name [schema_name in server2]"
+	app.UsageText = "mydiff --server1=user:pass@tcp(host:port)/ --server2=user:pass@tcp(host:port)/ GLOBAL OPTIONS schema_name"
 
 	app.HideHelp = true
 	app.HideVersion = true
@@ -47,11 +47,11 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "server1",
-			Usage: "connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.",
+			Usage: "connection information for second server in the form of a DSN (<user>[:<password>]@tcp(<host>[:<port>])/)",
 		},
 		cli.StringFlag{
 			Name:  "server2",
-			Usage: "connection information for second server in the form of a DSN (<user>[:<password>]@<host>[:<port>][:<socket>]) or path to socket file.",
+			Usage: "connection information for second server in the form of a DSN (<user>[:<password>]@tcp(<host>[:<port>])/)",
 		},
 		cli.StringFlag{
 			Name:  "d, diff-type",
