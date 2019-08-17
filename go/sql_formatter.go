@@ -13,19 +13,12 @@
 
 package mydiff
 
-import (
-	"testing"
+// SQLFormatter formats a Diff in SQL format
+// (ALTER, CREATE and DROP statements)
+type SQLFormatter struct{}
 
-	. "github.com/stretchr/testify/assert"
-)
-
-func TestNewFormatter_Existing(t *testing.T) {
-	formatter, _ := NewFormatter("sQl")
-	IsType(t, formatter, &SQLFormatter{})
-}
-
-func TestNewFormatter_NonExisting(t *testing.T) {
-	formatter, err := NewFormatter("foo")
-	Error(t, err, "fasfasdf")
-	Nil(t, formatter)
+// Format formats a diff returning a slice of string commands, each of
+// which is an SQL ALTER, CREATE or DROP statement.
+func (f *SQLFormatter) Format(diff *Diff) interface{} {
+	return diff.Raw().String()
 }
