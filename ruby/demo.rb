@@ -132,7 +132,7 @@ if $0 == __FILE__
 
     wait
 
-    demo "Let's try now with two different schemas, some tables missing, different encodings and migrations" do
+    demo "Let's try now with two different schemas, we have now different encodings and migrations" do
        load_sql "demo2_server1.sql", SERVER1
        load_sql "demo2_server2.sql", SERVER2
     end

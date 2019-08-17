@@ -5,7 +5,7 @@ USE acme_inc;
 CREATE TABLE IF NOT EXISTS my_migrations (
     val VARCHAR(255) NOT NULL,
 	UNIQUE KEY version_key(val)
-)  ENGINE=INNODB;
+);
 
 INSERT INTO my_migrations values (20190815193300);
 INSERT INTO my_migrations values (20190816000000);

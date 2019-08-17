@@ -9,4 +9,4 @@ CREATE TABLE employees (
     last_name   VARCHAR(16)     NOT NULL,
     hire_date   DATE            NOT NULL,
     PRIMARY KEY (first_name, last_name)
-) ENGINE=INNODB;
+);

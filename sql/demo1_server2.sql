@@ -11,4 +11,11 @@ CREATE TABLE employees (
     hire_date   DATE,
     PRIMARY KEY (id),
     UNIQUE KEY unique_name(first_name, last_name)
-)
+);
+
+CREATE TABLE departments (
+    id          INT             NOT NULL,
+    dept_name   VARCHAR(40)     NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE  KEY (dept_name)
+);

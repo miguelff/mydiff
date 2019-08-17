@@ -16,7 +16,7 @@ CREATE TABLE employees (
 CREATE TABLE IF NOT EXISTS schema_migrations (
     version VARCHAR(255) NOT NULL,
 	UNIQUE KEY version_key(version)
-)  ENGINE=INNODB;
+);
 
 INSERT INTO schema_migrations values (20190815193300);
 INSERT INTO schema_migrations values (20190817000000);
