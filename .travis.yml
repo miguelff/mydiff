@@ -12,6 +12,7 @@ install: true
 
 before_install:
   - make db_up
+  - go get ./...
 
 script:
   - env GO111MODULE=on make build
