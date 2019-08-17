@@ -95,7 +95,7 @@ end
 if $0 == __FILE__
     puts LOGO
 
-    demo "Welcome to mydiff's interactive demo. The following are the command options available, they will be used along the demo:" do
+    demo "Welcome to mydiff's interactive demo. The following are the command options available, they will be used along the way:" do
         run_mydiff "-h"
     end
 
@@ -132,7 +132,7 @@ if $0 == __FILE__
 
     wait
 
-    demo "Let's try now with two different schemas, some tables missing here and there and different collations" do
+    demo "Let's try now with two different schemas, some tables missing, different encodings and migrations" do
        load_sql "demo2_server1.sql", SERVER1
        load_sql "demo2_server2.sql", SERVER2
     end
@@ -145,7 +145,7 @@ if $0 == __FILE__
 
     wait
 
-    demo "schema_migrations.version is very specific to rails, so we can specify other table and column containing the applied migrations" do
+    demo "schema_migrations.version is very specific to rails, so we can provide another table and column containing the applied migrations" do
        load_sql "demo3_server1.sql", SERVER1
        load_sql "demo3_server2.sql", SERVER2
        wait "Press ENTER to run diff"

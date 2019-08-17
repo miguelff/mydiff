@@ -30,5 +30,5 @@ db_up:
 
 .PHONY: demo
 demo: db_up
-	ruby demo.rb
+	ruby ruby/demo.rb
 
