@@ -8,11 +8,11 @@ clean:
 
 .PHONY: test
 test: db_up
-	go test -count=1 -v ./go/...
+	go test -count=1 -v -mod=vendor ./go/...
 
 .PHONY: coverage
 coverage: db_up
-	go test -count=1 -v ./go/... -coverprofile .coverage
+	go test -count=1 -v -mod=vendor ./go/... -coverprofile .coverage
 	go tool cover -html .coverage
 
 .PHONY: build
