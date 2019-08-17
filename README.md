@@ -1,13 +1,9 @@
 # `mydiff`
 
-<!-- Uncomment when opensourced
-[![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=for-the-badge)](http://godoc.org/github.com/miguelff/mydiff)
--->
-
 [![Travis](https://travis-ci.com/miguelff/mydiff.svg?token=1bFaTyv8B89uBs2sxt7M&branch=master)](https://travis-ci.org/miguelff/mydiff)
 [![Coverage Status](https://coveralls.io/repos/github/miguelff/mydiff/badge.svg?branch=master&t=41u1ce)](https://coveralls.io/github/miguelff/mydiff?branch=master)
 
-<img width="1024" alt="mydiff logo" src="https://user-images.githubusercontent.com/210307/62741731-4f22de00-ba3c-11e9-89ee-da12f92e0b4f.png">
+<img width="350" alt="mydiff logo" src="https://user-images.githubusercontent.com/210307/63217891-7705f600-c14e-11e9-977b-17e5863ce4b4.png">
 
 Compute the differences between two MySQL schemas.
 
