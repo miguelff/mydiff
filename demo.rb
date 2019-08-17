@@ -95,7 +95,13 @@ end
 if $0 == __FILE__
     puts LOGO
 
-    demo "First we load the servers with two schemas, the schema contains a different definition of the table employees" do
+    demo "Welcome to mydiff's interactive demo. The following are the command options available, they will be used along the demo:" do
+        run_mydiff "-h"
+    end
+
+    wait
+
+    demo "Let's start by loading two really simple schemas in different servers (#{SERVER1}, #{SERVER2})" do
         load_sql "demo1_server1.sql", SERVER1
         load_sql "demo1_server2.sql", SERVER2
     end
@@ -120,7 +126,31 @@ if $0 == __FILE__
 
     wait
 
-    demo "Like before, this can be reversed" do
+    demo "Like before, this can be reversed, and results are consistent" do
        run_mydiff "-d compact -r"
     end
+
+    wait
+
+    demo "Let's try now with two different schemas, some tables missing here and there and different collations" do
+       load_sql "demo2_server1.sql", SERVER1
+       load_sql "demo2_server2.sql", SERVER2
+    end
+
+    wait
+
+    demo "We apply compact formatting to the diff and include differences in the schema migrations table" do
+       run_mydiff "-d compact --diff-migrations"
+    end
+
+    wait
+
+    demo "schema_migrations.version is very specific to rails, so we can specify other table and column containing the applied migrations" do
+       load_sql "demo3_server1.sql", SERVER1
+       load_sql "demo3_server2.sql", SERVER2
+       wait "Press ENTER to run diff"
+       run_mydiff "-d compact --diff-migrations --diff-migrations-column my_migrations.val"
+    end
+
+    say "And that's all. Have questions? drop an email to: hola+mydiff@mff.io"
 end

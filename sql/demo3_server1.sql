@@ -1,0 +1,11 @@
+DROP DATABASE IF EXISTS acme_inc;
+CREATE DATABASE IF NOT EXISTS acme_inc CHARACTER SET UTF8mb4 COLLATE utf8mb4_bin;
+USE acme_inc;
+
+CREATE TABLE IF NOT EXISTS my_migrations (
+    val VARCHAR(255) NOT NULL,
+	UNIQUE KEY version_key(val)
+)  ENGINE=INNODB;
+
+INSERT INTO my_migrations values (20190815193300);
+INSERT INTO my_migrations values (20190817000000);

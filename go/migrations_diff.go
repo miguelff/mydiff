@@ -93,7 +93,7 @@ func (m *MigrationsDiff) ObjectKey() tengo.ObjectKey {
 
 // Statement (see tengo.ObjectType)
 func (m *MigrationsDiff) Statement(tengo.StatementModifiers) (string, error) {
-	panic("Not implemented yet")
+	panic("Diffing schema migrations is not supported in formats other than compact")
 }
 
 // IsEmpty determines whether the migrations diff is empty

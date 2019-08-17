@@ -55,16 +55,16 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:  "d, diff-type",
-			Value: "sql",
-			Usage: "display differences in one of the following formats: [sql|gh-ost|ar]",
+			Value: "compact",
+			Usage: "display differences in one of the following formats: [sql|compact]",
 		},
 		cli.BoolFlag{
 			Name:  "diff-migrations",
-			Usage: "if the schema has a migrations table, compute its difference",
+			Usage: "if the schema has a migrations table, compute its difference. Works only with compact formatting",
 		},
 		cli.StringFlag{
 			Name:  "diff-migrations-column",
-			Value: "schema_migrations.value",
+			Value: "schema_migrations.version",
 			Usage: "if --diff-migrations is enabled, this flag will determine which column values to compare in both schemas",
 		},
 		cli.BoolFlag{
@@ -128,6 +128,10 @@ func main() {
 			tmp := to
 			to = from
 			from = tmp
+
+			sTmp := server1
+			server1 = server2
+			server2 = sTmp
 		}
 
 		diff := mydiff.NewDiff(server1.BaseDSN, server2.BaseDSN, from, to, includeMigrations, migrationsCol)
