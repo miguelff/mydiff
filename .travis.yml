@@ -1,7 +1,7 @@
 sudo: required
 language: go
 go:
-  - "1.12.x"
+  - "1.10.x"
 services:
   - docker
 
@@ -14,4 +14,5 @@ before_install:
   - make db_up
 
 script:
-  - make test
+  - env GO111MODULE=on make build
+  - env GO111MODULE=on make test
