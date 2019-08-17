@@ -29,6 +29,6 @@ db_up:
 	docker-compose up -d --build
 
 .PHONY: demo
-demo: db_up
+demo: build db_up
 	ruby ruby/demo.rb
 
