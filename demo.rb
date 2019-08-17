@@ -86,7 +86,7 @@ def load_sql(file, server)
 end
 
 def run_mydiff(opts)
-    cmd = %(mydiff --server1 "root@tcp(#{SERVER1})/#{SCHEMA_NAME}" --server2 "root@tcp(#{SERVER2})/#{SCHEMA_NAME}" #{opts} #{SCHEMA_NAME})
+    cmd = %(mydiff --server1 "root@tcp(#{SERVER1})/" --server2 "root@tcp(#{SERVER2})/" #{opts} #{SCHEMA_NAME})
     say "Running mydiff: #{cmd}"
     puts
     puts `docker run --network=host --rm -it $(docker build -q -f Dockerfile.client .) /#{cmd}`

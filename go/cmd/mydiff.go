@@ -100,11 +100,11 @@ func main() {
 		if schema1 == "" {
 			return cli.NewExitError("schema_name has to be provided", ESchemaNameNotProvided)
 		}
-		server1, err := tengo.NewInstance(driver, c.GlobalString("server1"))
+		server1, err := tengo.NewInstance(driver, mydiff.ParseDSN(c.GlobalString("server1")).FormatDSN())
 		if err != nil {
 			return cli.NewExitError(fmt.Sprintf("server1 has to be a server DSN. Error: %s", err.Error()), EServInvalid)
 		}
-		server2, err := tengo.NewInstance(driver, c.GlobalString("server2"))
+		server2, err := tengo.NewInstance(driver, mydiff.ParseDSN(c.GlobalString("server2")).FormatDSN())
 		if err != nil {
 			return cli.NewExitError(fmt.Sprintf("server2 has to be a server DSN. Error: %s", err.Error()), EServInvalid)
 		}
