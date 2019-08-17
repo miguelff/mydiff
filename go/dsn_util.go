@@ -1,6 +1,8 @@
 package mydiff
 
-import "github.com/go-sql-driver/mysql"
+import (
+	"github.com/go-sql-driver/mysql"
+)
 
 type ParsedDSN struct {
 	*mysql.Config
