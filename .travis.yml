@@ -17,5 +17,5 @@ install:
 before_install:
 - make db_up
 script:
-- go test -v -covermode=count -coverprofile=coverage.out
+- go test -count=1 -v -mod=vendor -covermode=count -coverprofile=coverage.out ./go/...
 - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
