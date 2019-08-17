@@ -37,9 +37,10 @@ COPYRIGHT:
 
 * `make test` will run [golangci-lint](https://github.com/golangci/golangci-lint) and integration tests.
 
-* `make demo` load slightly different schemas dumps in two different servers and use `mydiff` to compute the differences using a variety of command options.
+* `make demo` runs an interactive demo using `mydiff` to compute schema differences using a variety of command options.
 
 Both the tests and the demo will use docker-compose to spawn two mysql servers and thus mimic a real usage scenario.
+In addition, you expect to have a ruby interpreter in your system to run the demo.
     
 ## Design decisions and trade-offs
 
@@ -55,7 +56,6 @@ Also, because [skeema/tengo](github.com/skeema/tengo/) provides [tests to ensure
 
 - [ ] Detecting changes in auto-increment initial values is not supported. This can be implemented by querying the auto increment values on the server directly, however this was not an initial requirement for the project and thus is left out of the scope of this first version of the tool.
 - [ ] Changes in encoding are detected, however the formatter only displays the encoding in the second schema being compared as tengo loses information about how it was before. This can be fixed by querying the DB on server1 and inspecting the table collation and encoding, but this is left out of the scope as the compact output informs about a mismatch in encoding pretty clearly. 
-- [ ] Demo: TBC
 
 ## License
 

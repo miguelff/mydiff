@@ -50,5 +50,5 @@ func NewFormatter(diffType string) (Formatter, error) {
 	if formatter, ok := formatters[strings.ToLower(diffType)]; ok {
 		return formatter, nil
 	}
-	return nil, fmt.Errorf("Unkown formatter, only (%s) are allowed", strings.Join(existingFormatters(), ","))
+	return nil, fmt.Errorf("Unkown formatter '%s', only (%s) are allowed", diffType, strings.Join(existingFormatters(), ","))
 }
