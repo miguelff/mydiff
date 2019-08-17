@@ -18,9 +18,9 @@ import (
 	"strings"
 )
 
-// formatters contains a private map with the available
-// formatters
-var formatters map[string]Formatter = map[string]Formatter{
+// AvailableFormatters is a map with the available
+// formatters indexed by their name.
+var AvailableFormatters map[string]Formatter = map[string]Formatter{
 	"sql":     &SQLFormatter{},
 	"compact": &CompactFormatter{},
 }
@@ -29,7 +29,7 @@ var formatters map[string]Formatter = map[string]Formatter{
 // in the system
 func existingFormatters() []string {
 	keys := []string{}
-	for k := range formatters {
+	for k := range AvailableFormatters {
 		keys = append(keys, k)
 	}
 	return keys
@@ -47,7 +47,7 @@ type Formatter interface {
 // - sql: which returns a SQLFormatter
 // If the difftype is unknown, then an error is returned.
 func NewFormatter(diffType string) (Formatter, error) {
-	if formatter, ok := formatters[strings.ToLower(diffType)]; ok {
+	if formatter, ok := AvailableFormatters[strings.ToLower(diffType)]; ok {
 		return formatter, nil
 	}
 	return nil, fmt.Errorf("Unkown formatter '%s', only (%s) are allowed", diffType, strings.Join(existingFormatters(), ","))
