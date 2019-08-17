@@ -1,5 +1,9 @@
 # `mydiff`
 
+<!-- Uncomment when opensourced
+[![GoDoc](https://godoc.org/github.com/miguelff/mydiff?status.svg)](https://godoc.org/github.com/bytesparadise/libasciidoc)
+-->
+
 <img width="1024" alt="mydiff logo" src="https://user-images.githubusercontent.com/210307/62741731-4f22de00-ba3c-11e9-89ee-da12f92e0b4f.png">
 
 Compute the differences between two MySQL schemas.

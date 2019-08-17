@@ -1,0 +1,28 @@
+sudo: required
+language: go
+go:
+  - "1.9.x"
+services:
+  - docker
+
+notifications:
+  email: false
+
+env:
+  global:
+    - SKEEMA_TEST_IMAGES="mysql:5.6,mysql:5.7"
+
+install: true
+
+before_install:
+  - make db_up
+
+script:
+  - make test
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: curl -sL https://git.io/goreleaser | bash
+    on:
+      tags: true
