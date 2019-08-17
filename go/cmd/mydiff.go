@@ -121,8 +121,14 @@ func main() {
 		if err != nil {
 			return cli.NewExitError(err, EUnkownFormatter)
 		}
-		includeMigrations := c.GlobalBool("diff-migrations")
-		migrationsCol := c.GlobalString("diff-migrations-column")
+
+		var includeMigrations bool
+		var migrationsCol string
+
+		if formatter == mydiff.AvailableFormatters["compact"] {
+			includeMigrations = c.GlobalBool("diff-migrations")
+			migrationsCol = c.GlobalString("diff-migrations-column")
+		}
 
 		if c.GlobalBool("reverse") {
 			tmp := to
