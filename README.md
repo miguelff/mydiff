@@ -1,5 +1,8 @@
 # `mydiff`
-
+<!-- Uncomment when opensourced
+[![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=plastic)](http://godoc.org/github.com/miguelff/mydiff)
+[![Go Report Card](https://goreportcard.com/badge/github.com/miguelff/cable)](https://goreportcard.com/report/github.com/miguelff/mydiff)
+-->
 [![Travis](https://travis-ci.com/miguelff/mydiff.svg?token=1bFaTyv8B89uBs2sxt7M&branch=master)](https://travis-ci.org/miguelff/mydiff)
 [![Coverage Status](https://coveralls.io/repos/github/miguelff/mydiff/badge.svg?branch=master&t=41u1ce)](https://coveralls.io/github/miguelff/mydiff?branch=master)
 
