@@ -40,7 +40,6 @@ SERVER1 = "127.0.0.1:33060"
 SERVER2 = "127.0.0.1:33062"
 SCHEMA_NAME = "acme_inc"
 
-
 class String
   def black; "\e[30m#{self}\e[0m" end
   def cyan; "\e[36m#{self}\e[0m" end
